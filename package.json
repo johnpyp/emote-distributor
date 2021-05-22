@@ -1,0 +1,19 @@
+{
+  "name": "emote-distributor",
+  "version": "0.0.1",
+  "description": "A bot for building clusters of emote servers",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnpyp/emote-distributor.git"
+  },
+  "author": "johnpyp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/johnpyp/emote-distributor/issues"
+  },
+  "homepage": "https://github.com/johnpyp/emote-distributor#readme"
+}
