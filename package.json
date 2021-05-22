@@ -17,8 +17,7 @@
   },
   "homepage": "https://github.com/johnpyp/emote-distributor#readme",
   "dependencies": {
-    "discord.js": "^12.5.3",
-    "rome": "^10.0.4-beta"
+    "discord.js": "^12.5.3"
   },
   "devDependencies": {
     "esbuild": "^0.12.1",
