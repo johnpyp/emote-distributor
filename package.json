@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/johnpyp/emote-distributor/issues"
   },
-  "homepage": "https://github.com/johnpyp/emote-distributor#readme"
+  "homepage": "https://github.com/johnpyp/emote-distributor#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "rome": "^10.0.4-beta"
+  },
+  "devDependencies": {
+    "esbuild": "^0.12.1",
+    "estrella": "^1.4.1",
+    "typescript": "^4.2.4"
+  }
 }
