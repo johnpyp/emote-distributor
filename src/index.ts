@@ -1,3 +1,14 @@
-console.log("hello world");
+import { Bot } from "./bot";
+import { appConfig } from "./app-config";
 
-export {};
+async function main() {
+  await Bot.create(appConfig.BOT_TOKEN);
+}
+
+main().catch(console.error);
+
+process.on("unhandledRejection", (reason, p) => {
+  console.error("Unhandled Rejection at: ", p);
+  process.exit(1);
+  // application specific logging, throwing an error, or other logic here
+});

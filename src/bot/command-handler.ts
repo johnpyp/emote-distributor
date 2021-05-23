@@ -1,0 +1,85 @@
+import { Client, Message } from "discord.js";
+import { logger } from "../logger";
+import { Command } from "./command";
+import { CommandStore } from "./command-store";
+
+export interface ParsedMessage {
+  prefix: string;
+  command: string;
+  args: string[];
+  message: Message;
+}
+
+export interface CommandHandlerOptions {
+  client: Client;
+  defaultPrefix: string;
+}
+
+export class CommandHandler {
+  private commandStore: CommandStore = new CommandStore();
+
+  private client: Client;
+
+  private opts: CommandHandlerOptions;
+
+  constructor(opts: CommandHandlerOptions) {
+    this.client = opts.client;
+    this.opts = opts;
+  }
+
+  public register(command: Command): void {
+    this.commandStore.register(command);
+    command.setup(this.client);
+  }
+
+  public deregister(id: string): void {
+    this.commandStore.deregister(id);
+  }
+
+  public async handleMessage(message: Message): Promise<void> {
+    const parsed = CommandHandler.parseContent(message, [this.opts.defaultPrefix]);
+    if (!parsed) return;
+    const command = this.commandStore.aliasFind(parsed.command);
+    if (!command) return;
+    return this.handleParsedMessage(command, parsed);
+  }
+
+  private async handleParsedMessage(command: Command, parsed: ParsedMessage): Promise<void> {
+    const { message } = parsed;
+    logger.verbose(`Attempting to route to command '${parsed.command}'`);
+
+    if (command.guildOnly && message.channel.type === "dm") return;
+
+    const { subCommands } = command;
+    if (subCommands && parsed.args.length > 0) {
+      const subCommandId = subCommands.get(parsed.args[0]);
+      const nextCommand = this.commandStore.get(subCommandId);
+      if (nextCommand) {
+        return this.handleParsedMessage(nextCommand, {
+          ...parsed,
+          command: `${parsed.command} ${parsed.args[0]}`,
+          args: parsed.args.slice(1),
+        });
+      }
+    }
+
+    await command.exec(message, parsed.args);
+  }
+
+  public static parseContent(message: Message, prefixes: string[]): ParsedMessage | null {
+    const prefix = prefixes.find((p) => message.content.startsWith(p));
+    if (!prefix) return null;
+    const allArgs = message.content.slice(prefix.length).trim().split(" ");
+
+    const command = allArgs[0];
+    if (!command) return null;
+
+    logger.verbose(`Parsed command: ${command}, args: ${allArgs.slice(1)}`);
+    return {
+      prefix,
+      command,
+      args: allArgs.slice(1),
+      message,
+    };
+  }
+}

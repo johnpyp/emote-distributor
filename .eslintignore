@@ -3,5 +3,9 @@
 /node_modules/**
 /tests/fixtures/**
 /tmp/**
+/out/**
+/dist/**
+
+.eslintrc.js
 
 build.js

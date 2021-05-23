@@ -4,10 +4,11 @@
   "description": "A bot for building clusters of emote servers",
   "main": "dist/index.js",
   "scripts": {
+    "dev": "node -r dotenv/config -r ts-eager/register src/index.ts",
     "format": "npm run format:eslint && npm run format:prettier",
     "format:eslint": "npm run lint -- --fix",
     "format:prettier": "prettier --write \"{**/*,*}.{js,json,md,ts,yaml}\"",
-    "lint": "eslint \"{**/*,*}.{js,ts}\""
+    "lint": "eslint . --ext .js,.ts"
   },
   "repository": {
     "type": "git",
@@ -20,10 +21,17 @@
   },
   "homepage": "https://github.com/johnpyp/emote-distributor#readme",
   "dependencies": {
-    "discord.js": "^12.5.3"
+    "discord.js": "^12.5.3",
+    "fs-extra": "^10.0.0",
+    "reflect-metadata": "^0.1.13",
+    "sqlite": "^4.0.22",
+    "typeorm": "^0.2.32",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@types/node": "^15.6.0",
     "@typescript-eslint/eslint-plugin": "4.24.0",
+    "dotenv": "^10.0.0",
     "esbuild": "0.12.1",
     "eslint": "7.27.0",
     "eslint-config-airbnb-base": "14.2.1",
@@ -34,6 +42,8 @@
     "eslint-plugin-jsx-a11y": "6.4.1",
     "estrella": "1.4.1",
     "prettier": "2.3.0",
+    "ts-eager": "^2.0.2",
+    "ts-node": "^9.1.1",
     "typescript": "4.2.4"
   }
 }

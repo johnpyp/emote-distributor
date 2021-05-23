@@ -1,8 +1,13 @@
 module.exports = {
 	root: true,
-	extends: ["airbnb-base", "plugin:@typescript-eslint/recommended", "prettier"],
+	extends: ["airbnb-typescript/base", "plugin:@typescript-eslint/recommended", "prettier"],
 	env: {
 		node: true,
+	},
+	plugins: ["@typescript-eslint"],
+	parserOptions: {
+		tsconfigRootDir: __dirname,
+		project: ["./tsconfig.eslint.json"],
 	},
 	// settings: {
 	// 	"import/resolver": {
@@ -15,6 +20,7 @@ module.exports = {
 		"no-await-in-loop": ["off"],
 		"no-console": ["off"],
 		"import/extensions": ["error", "never"],
+		"import/no-cycle": ["off"],
+		"consistent-return": ["off"],
 	},
-	parser: "@typescript-eslint/parser",
 };

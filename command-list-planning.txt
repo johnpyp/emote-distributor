@@ -1,0 +1,20 @@
+cluster create <cluster id> <cluster name?> - Creates a new cluster (caller becomes owner)
+cluster delete <cluster id?> - Deletes this server's cluster (or provided id) (owner)
+
+cluster refresh - Refreshes the cluster's emote cache
+
+cluster transfer-ownership <user id | @ user > - Give owning control of the cluster over to another user (owner)
+cluster add-admin <user id | @ user > - Gives a user the permissions to control a cluster. (owner)
+cluster remove-admin <user id | @ user > - Removes an admin from a cluster (owner)
+cluster add-moderator <user id | @ user> - Gives a user the permission to add and remove emotes from a cluster (admin)
+cluster remove-moderator <user id | @ user > - Removes a moderator from a cluster (admin)
+
+cluster join <cluster id> - Joins this server to a given cluster, assuming this user has permissions to control the cluster (admin AND guild admin)
+cluster leave <guild id?> - Leaves the cluster this server is apart of (admin OR guild admin)
+
+cluster info - List other servers in cluster, emote stats (anyone, configurable)
+cluster invites - Generates a list of invites for the other servers in a cluster (anyone, configurable)
+
+emote add <emote id> <url | image | emote> - Adds an emote a cluster (moderator)
+emote delete <emote id | emote> - Removes an emote from a cluster (moderator)
+emote rename <emote id | emote> <emote id> - Renames an emote in the cluster (moderator)

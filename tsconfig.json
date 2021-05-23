@@ -20,7 +20,8 @@
     "sourceMap": true,
     "strictBindCallApply": true,
     "strictNullChecks": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "emitDecoratorMetadata": true
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["node_modules/**"]
