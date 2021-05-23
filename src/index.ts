@@ -1,7 +1,9 @@
 import { Bot } from "./bot";
 import { appConfig } from "./app-config";
+import { initializeDatabase } from "./database";
 
 async function main() {
+  await initializeDatabase();
   await Bot.create(appConfig.BOT_TOKEN);
 }
 

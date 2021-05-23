@@ -52,7 +52,7 @@ export abstract class Command {
     this.userCooldown = opts.cooldown ?? 2;
   }
 
-  abstract exec(message: Message, args: string[]): Promise<void>;
+  abstract exec(message: Message, args: string[]): Promise<unknown>;
 
   public setup(client: Client): Command {
     this.client = client;

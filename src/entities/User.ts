@@ -14,4 +14,14 @@ export class User extends BaseEntity {
 
   @ManyToOne(() => Cluster, (cluster) => cluster.moderators)
   public moderatorClusters: Cluster[];
+
+  static async findOrCreate(authorId: string): Promise<User> {
+    const foundUser = await User.findOne(authorId);
+    if (foundUser) return foundUser;
+
+    const user = await User.create({
+      id: authorId,
+    }).save();
+    return user;
+  }
 }

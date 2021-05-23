@@ -6,7 +6,7 @@ export class Guild extends BaseEntity {
   @PrimaryColumn()
   public id: string;
 
-  @ManyToOne(() => Cluster, (cluster) => cluster.guilds)
+  @ManyToOne(() => Cluster, (cluster) => cluster.guilds, { onDelete: "CASCADE" })
   public cluster: Cluster;
 
   @Column({ type: "date", nullable: true })

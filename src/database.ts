@@ -1,8 +1,10 @@
 import { Connection, createConnection } from "typeorm";
 import { appConfig } from "./app-config";
+import { Cluster } from "./entities/Cluster";
 import { Guild } from "./entities/Guild";
+import { User } from "./entities/User";
 
-export async function createDatabase(): Promise<Connection> {
+export async function initializeDatabase(): Promise<Connection> {
   return createConnection({
     type: "sqlite",
     database: appConfig.SQLITE_PATH,
@@ -11,6 +13,6 @@ export async function createDatabase(): Promise<Connection> {
     logging: false,
     enableWAL: true,
 
-    entities: [Guild],
+    entities: [Guild, Cluster, User],
   });
 }

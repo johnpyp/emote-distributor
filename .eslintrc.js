@@ -22,5 +22,6 @@ module.exports = {
 		"import/extensions": ["error", "never"],
 		"import/no-cycle": ["off"],
 		"consistent-return": ["off"],
+		"class-methods-use-this": ["off"],
 	},
 };
