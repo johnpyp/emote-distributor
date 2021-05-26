@@ -21,6 +21,7 @@ export class BaseError extends Error {
 
 export class UserError extends BaseError {}
 
+export const VALID_EMOTE_REGEX = /^[a-zA-Z0-9_]{2,}$/;
 export const EMOTE_REGEX = /(:|;)(?<name>\w{2,32})\1|(?<newline>\n)/g;
 
 export const CUSTOM_EMOTE_REGEX = /<(?<animated>a?):(?<name>\w{2,32}):(?<id>\d{17,})>/g;
@@ -129,6 +130,10 @@ export async function resolveEmote(
     return possibleEmotes.first()!;
   }
   throw new UserError("Emote not found");
+}
+
+export function cleanEmoteName(name: string): string {
+  return _.trim(name, ":");
 }
 
 export interface EmojiUsage {

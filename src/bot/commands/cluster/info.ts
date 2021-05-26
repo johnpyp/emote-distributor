@@ -1,6 +1,5 @@
 import { Message } from "discord.js";
 import { Cluster } from "../../../entities/Cluster";
-import { ClusterUser } from "../../../entities/ClusterUser";
 import { Command } from "../../command";
 import { guardPermissions, Permission } from "../../permissions";
 import { displayPercentage, getEmojiUsage } from "../../util";

@@ -1,4 +1,4 @@
-import { Client, Collection, Guild as DiscordGuild } from "discord.js";
+import { Client, Collection, Guild as DiscordGuild, Util } from "discord.js";
 import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Guild } from "./Guild";
 import { ClusterUser } from "./ClusterUser";
@@ -44,7 +44,7 @@ export class Cluster extends BaseEntity {
   }
 
   public displayString(): string {
-    return `${this.name} (${this.publicClusterId})`;
+    return Util.escapeMarkdown(`${this.name} (${this.publicClusterId})`);
   }
 
   static async getClusterByGuild(guildId?: string): Promise<Cluster | null> {

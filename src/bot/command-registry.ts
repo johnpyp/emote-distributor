@@ -9,6 +9,7 @@ import { ClusterSetRole } from "./commands/cluster/set-role";
 import { EmoteAdd } from "./commands/emote/add";
 import { EmoteList } from "./commands/emote/list";
 import { EmoteRemove } from "./commands/emote/remove";
+import { EmoteRename } from "./commands/emote/rename";
 import { Ping } from "./commands/ping";
 import { SubcommandHandler } from "./subcommand";
 
@@ -41,6 +42,7 @@ export function registerCommands(handler: CommandHandler): void {
   handler.register(new EmoteAdd("emote:add"));
   handler.register(new EmoteRemove("emote:remove"));
   handler.register(new EmoteList("emote:list"));
+  handler.register(new EmoteRename("emote:rename"));
 
   handler.register(
     new SubcommandHandler(
@@ -50,6 +52,7 @@ export function registerCommands(handler: CommandHandler): void {
         remove: "emote:remove",
         delete: "emote:remove",
         list: "emote:list",
+        rename: "emote:rename",
       },
       { aliases: ["emote"] }
     )

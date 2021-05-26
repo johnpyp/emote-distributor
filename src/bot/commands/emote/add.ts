@@ -1,9 +1,9 @@
-import { Message } from "discord.js";
+import { Message, Util } from "discord.js";
 import _ from "lodash";
 import { Cluster } from "../../../entities/Cluster";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
-import { getEmojiUsage, parseEmoteData, UserError } from "../../util";
+import { getEmojiUsage, parseEmoteData, UserError, VALID_EMOTE_REGEX } from "../../util";
 
 export class EmoteAdd extends Command {
   constructor(id: string) {
@@ -25,6 +25,12 @@ export class EmoteAdd extends Command {
 
     const { name, url, animated } = parseEmoteData(message, args);
 
+    const isValidName = VALID_EMOTE_REGEX.test(name);
+    if (!isValidName)
+      return message.reply(
+        "Emote name is formatted incorrectly: only letters, numbers, and underscores are allowed ❌"
+      );
+
     const guilds = cluster.getDiscordGuilds(this.client);
 
     const nonFullGuilds = guilds
@@ -40,6 +46,8 @@ export class EmoteAdd extends Command {
 
     const emoji = await lowestUsage.guild.emojis.create(url, name);
 
-    return message.reply(`New emote :${emoji.name}: added to ${cluster.displayString()}: ${emoji}`);
+    return message.reply(
+      `New emote :${Util.escapeMarkdown(emoji.name)}: added to ${cluster.displayString()}: ${emoji}`
+    );
   }
 }

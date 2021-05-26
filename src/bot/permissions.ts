@@ -6,9 +6,7 @@ export enum Permission {
   ListCluster,
 
   OverrideManager,
-  DeleteManager,
   OverrideModerator,
-  DeleteModerator,
 
   JoinCluster,
   LeaveCluster,
@@ -64,14 +62,12 @@ export const clusterManagerPermissions = [
   Permission.JoinCluster,
   Permission.LeaveCluster,
   Permission.OverrideModerator,
-  Permission.DeleteModerator,
 ];
 
 export const clusterOwnerPermissions = [
   ...clusterManagerPermissions,
   Permission.TransferOwnership,
   Permission.OverrideManager,
-  Permission.DeleteManager,
   Permission.DeleteCluster,
 ];
 
