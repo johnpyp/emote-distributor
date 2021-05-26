@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "node -r dotenv/config -r ts-eager/register src/index.ts",
+    "start:prod": "node -r ts-eager/register src/index.ts",
     "format": "npm run format:eslint && npm run format:prettier",
     "format:eslint": "npm run lint -- --fix",
     "format:prettier": "prettier --write \"{**/*,*}.{js,json,md,ts,yaml}\"",

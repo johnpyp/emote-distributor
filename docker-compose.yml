@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  server:
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    environment:
+      - SQLITE_PATH=/workspace/data/db/prod.sqlite3
+      - NODE_ENV=production
+      - BOT_TOKEN=${BOT_TOKEN}
+    init: true
+    volumes:
+      - ${HOST_SQL_PATH:-./data/db}:/workspace/data/sql
+    restart: unless-stopped
