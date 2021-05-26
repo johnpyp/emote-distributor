@@ -28,6 +28,10 @@ export interface CommandOptions {
   userCooldown?: number;
 }
 
+export interface CommandUtil {
+  isBotAdmin: (id: string) => boolean;
+}
+
 export abstract class Command {
   public id: string;
 
@@ -52,7 +56,8 @@ export abstract class Command {
     this.userCooldown = opts.cooldown ?? 2;
   }
 
-  abstract exec(message: Message, args: string[]): Promise<unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  abstract exec(message: Message, args: string[], util: CommandUtil): Promise<any>;
 
   public setup(client: Client): Command {
     this.client = client;

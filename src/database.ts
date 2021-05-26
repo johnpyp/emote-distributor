@@ -1,6 +1,7 @@
 import { Connection, createConnection } from "typeorm";
 import { appConfig } from "./app-config";
 import { Cluster } from "./entities/Cluster";
+import { ClusterUser } from "./entities/ClusterUser";
 import { Guild } from "./entities/Guild";
 import { User } from "./entities/User";
 
@@ -13,6 +14,6 @@ export async function initializeDatabase(): Promise<Connection> {
     logging: false,
     enableWAL: true,
 
-    entities: [Guild, Cluster, User],
+    entities: [Guild, Cluster, User, ClusterUser],
   });
 }

@@ -1,7 +1,8 @@
 import { Client, Message } from "discord.js";
 import { logger } from "../logger";
-import { Command } from "./command";
+import { Command, CommandUtil } from "./command";
 import { CommandStore } from "./command-store";
+import { UserError } from "./util";
 
 export interface ParsedMessage {
   prefix: string;
@@ -13,6 +14,7 @@ export interface ParsedMessage {
 export interface CommandHandlerOptions {
   client: Client;
   defaultPrefix: string;
+  admins: string[];
 }
 
 export class CommandHandler {
@@ -22,9 +24,15 @@ export class CommandHandler {
 
   private opts: CommandHandlerOptions;
 
+  private commandUtil: CommandUtil;
+
   constructor(opts: CommandHandlerOptions) {
     this.client = opts.client;
     this.opts = opts;
+
+    this.commandUtil = {
+      isBotAdmin: (id) => this.opts.admins.includes(id),
+    };
   }
 
   public register(command: Command): void {
@@ -46,7 +54,6 @@ export class CommandHandler {
 
   private async handleParsedMessage(command: Command, parsed: ParsedMessage): Promise<void> {
     const { message } = parsed;
-    logger.verbose(`Attempting to route to command '${parsed.command}'`);
 
     if (command.guildOnly && message.channel.type === "dm") return;
 
@@ -63,7 +70,19 @@ export class CommandHandler {
       }
     }
 
-    await command.exec(message, parsed.args);
+    try {
+      await command.exec(message, parsed.args, this.commandUtil);
+    } catch (e) {
+      const error = e as Error;
+      if (error instanceof UserError) {
+        await message.reply(error.message);
+        return;
+      }
+      console.error(error);
+      logger.error("Error occurred while sending message", error);
+      await message.reply("Internal error");
+      /* handle error */
+    }
   }
 
   public static parseContent(message: Message, prefixes: string[]): ParsedMessage | null {

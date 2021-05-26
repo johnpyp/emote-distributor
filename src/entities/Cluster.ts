@@ -1,15 +1,9 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { Client, Collection, Guild as DiscordGuild } from "discord.js";
+import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Guild } from "./Guild";
-import { User } from "./User";
+import { ClusterUser } from "./ClusterUser";
+import { UserError } from "../bot/util";
+import { Roles } from "../bot/permissions";
 
 @Entity()
 export class Cluster extends BaseEntity {
@@ -23,31 +17,16 @@ export class Cluster extends BaseEntity {
   public name: string;
 
   @OneToMany(() => Guild, (guild) => guild.cluster, {
-    cascade: ["insert", "update"],
+    cascade: true,
     eager: true,
   })
   public guilds: Guild[];
 
-  @ManyToOne(() => User, (user) => user.ownedClusters, {
-    cascade: ["insert", "update"],
-    onDelete: "CASCADE",
+  @ManyToOne(() => ClusterUser, (clusterUser) => clusterUser.cluster, {
+    cascade: true,
     eager: true,
   })
-  public owner: User;
-
-  @ManyToMany(() => User, (user) => user.adminClusters, {
-    cascade: ["insert", "update"],
-    eager: true,
-  })
-  @JoinTable()
-  public admins: User[];
-
-  @ManyToMany(() => User, (user) => user.moderatorClusters, {
-    cascade: ["insert", "update"],
-    eager: true,
-  })
-  @JoinTable()
-  public moderators: User[];
+  public clusterUsers: ClusterUser[];
 
   @Column()
   public emoteManagersCanModerate: boolean;
@@ -58,15 +37,83 @@ export class Cluster extends BaseEntity {
   @Column()
   public enableInvites: boolean;
 
-  isOwner(id: string): boolean {
-    return this.owner.id === id;
+  public getDiscordGuilds(client: Client): Collection<string, DiscordGuild> {
+    return client.guilds.cache.filter((discordGuild) =>
+      this.guilds.some((guild) => guild.id === discordGuild.id)
+    );
   }
 
-  isAdmin(id: string): boolean {
-    return this.admins.some((user) => user.id === id) || this.isOwner(id);
+  public displayString(): string {
+    return `${this.name} (${this.publicClusterId})`;
   }
 
-  isModerator(id: string): boolean {
-    return this.moderators.some((user) => user.id === id) || this.isAdmin(id);
+  static async getClusterByGuild(guildId?: string): Promise<Cluster | null> {
+    if (!guildId) return null;
+    const cluster = await Cluster.findOne(
+      {},
+      {
+        where: {
+          guilds: {
+            id: guildId,
+          },
+        },
+        relations: ["guilds", "clusterUsers"],
+      }
+    );
+    return cluster ?? null;
   }
+
+  static async getClusterUserRole(clusterId: string, userId: string): Promise<Roles> {
+    const clusterUser = await ClusterUser.findOne({ userId, clusterId });
+    const role = clusterUser ? clusterUser.role : Roles.Anonymous;
+    return role;
+  }
+
+  static async getImplicitClusterAndRoleGuard(
+    guildId: string | undefined,
+    userId: string
+  ): Promise<ImplicitClusterAndRole> {
+    if (!guildId) throw new UserError("Not a guild message ❌");
+    const guild = await Guild.findOne({ id: guildId }, { relations: ["cluster"] });
+    if (!guild) throw new UserError("No cluster found for this guild ❌");
+    const { cluster } = guild;
+
+    const role = await Cluster.getClusterUserRole(cluster.id, userId);
+    return { cluster, role, guild };
+  }
+
+  static async getPublicClusterAndRoleGuard(
+    publicClusterId: string | undefined,
+    userId: string
+  ): Promise<PublicClusterAndRole> {
+    Cluster.publicClusterIdGuard(publicClusterId);
+    const cluster = await Cluster.findOne(
+      { publicClusterId },
+      { relations: ["clusterUsers", "guilds"] }
+    );
+    if (!cluster) throw new UserError(`Cluster '${publicClusterId}' doesn't exist ❌`);
+
+    const role = await Cluster.getClusterUserRole(cluster.id, userId);
+    return { cluster, role };
+  }
+
+  static publicClusterIdGuard(
+    publicClusterId: string | undefined
+  ): asserts publicClusterId is string {
+    if (!publicClusterId) throw new UserError("No cluster id provided ❌");
+
+    if (!/^[a-z-]+$/.test(publicClusterId))
+      throw new UserError("Cluster id can only contain lowercase letters and hyphens (-) ❌");
+  }
+}
+
+interface ImplicitClusterAndRole {
+  guild: Guild;
+  cluster: Cluster;
+  role: Roles;
+}
+
+interface PublicClusterAndRole {
+  cluster: Cluster;
+  role: Roles;
 }

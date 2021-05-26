@@ -23,5 +23,28 @@ module.exports = {
 		"import/no-cycle": ["off"],
 		"consistent-return": ["off"],
 		"class-methods-use-this": ["off"],
+
+		"@typescript-eslint/naming-convention": [
+			"error",
+			{
+				selector: "variable",
+				format: ["camelCase", "UPPER_CASE", "snake_case"],
+				leadingUnderscore: "allow",
+			},
+			{
+				selector: "parameter",
+				format: ["camelCase"],
+				leadingUnderscore: "allow",
+			},
+
+			{
+				selector: "typeLike",
+				format: ["PascalCase"],
+			},
+		],
+		"@typescript-eslint/no-unused-vars": [
+			"warn",
+			{ vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" },
+		],
 	},
 };

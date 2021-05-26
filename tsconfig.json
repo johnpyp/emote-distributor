@@ -18,6 +18,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
+    "noEmit": true,
     "strictBindCallApply": true,
     "strictNullChecks": true,
     "target": "ESNext",

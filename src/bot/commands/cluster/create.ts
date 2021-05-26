@@ -1,35 +1,37 @@
 import { Message } from "discord.js";
 import _ from "lodash";
 import { Cluster } from "../../../entities/Cluster";
+import { ClusterUser } from "../../../entities/ClusterUser";
 import { User } from "../../../entities/User";
 import { Command } from "../../command";
+import { Roles } from "../../permissions";
 
-export class ClusterCreateCommand extends Command {
-  constructor() {
-    super("cluster:create", { aliases: [], guildOnly: true });
+export class ClusterCreate extends Command {
+  constructor(id: string) {
+    super(id, { aliases: [], guildOnly: true });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
-    const [clusterId, clusterName] = args;
-    if (!clusterId) return message.reply("No cluster id provided ❌");
+    const [publicClusterId, clusterName] = args;
 
-    if (!/^[a-z-]+$/.test(clusterId))
-      return message.reply("Cluster id can only contain lowercase letters and hyphens (-) ❌");
+    Cluster.publicClusterIdGuard(publicClusterId);
 
-    if (await Cluster.findOne({ publicClusterId: clusterId }))
-      return message.reply(`Cluster '${clusterId}' already exists ❌`);
+    if (await Cluster.findOne({ publicClusterId }))
+      return message.reply(`Cluster '${publicClusterId}' already exists ❌`);
 
     const user = await User.findOrCreate(message.author.id);
 
     const cluster = await Cluster.create({
-      name: clusterName ?? _.startCase(_.toLower(clusterId)),
-      publicClusterId: clusterId,
-      owner: user,
+      name: clusterName ?? _.startCase(_.toLower(publicClusterId)),
+      publicClusterId,
       enableInvites: true,
       enableInfo: true,
       emoteManagersCanModerate: true,
     }).save();
 
-    return message.reply(`Cluster '${cluster.name}' (${cluster.publicClusterId}) created 🚀`);
+    const clusterUser = ClusterUser.create({ user, cluster, role: Roles.ClusterOwner });
+    await clusterUser.save();
+
+    return message.reply(`Cluster ${cluster.displayString()} created 🚀`);
   }
 }

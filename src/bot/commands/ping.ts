@@ -2,9 +2,9 @@ import { Message } from "discord.js";
 import { logger } from "../../logger";
 import { Command } from "../command";
 
-export class PingCommand extends Command {
-  constructor() {
-    super("ping", { aliases: ["ping"], guildOnly: true });
+export class Ping extends Command {
+  constructor(id: string) {
+    super(id, { aliases: ["ping"], guildOnly: true });
   }
 
   async exec(message: Message): Promise<void> {

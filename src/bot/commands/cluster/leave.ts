@@ -1,30 +1,25 @@
 import { Message } from "discord.js";
-import { Guild } from "../../../entities/Guild";
+import { Cluster } from "../../../entities/Cluster";
 import { Command } from "../../command";
+import { guardPermissions, Permission } from "../../permissions";
 
-export class ClusterLeaveCommand extends Command {
-  constructor() {
-    super("cluster:leave", { aliases: [], guildOnly: true });
+export class ClusterLeave extends Command {
+  constructor(id: string) {
+    super(id, { aliases: [], guildOnly: true });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
-    const discordGuild = message.guild;
-    if (!discordGuild) return;
+    const { cluster, role, guild } = await Cluster.getImplicitClusterAndRoleGuard(
+      message.guild?.id,
+      message.author.id
+    );
 
-    const guild = await Guild.findOne(discordGuild.id, { relations: ["cluster"] });
-
-    if (!guild) return message.reply("Guild not part of a cluster ❌");
-
-    if (
-      !guild.cluster.isAdmin(message.author.id) &&
-      !message.member?.hasPermission(["MANAGE_GUILD"])
-    )
-      return message.reply(`You do not have permission to leave this cluster with this server ❌`);
+    guardPermissions(role, Permission.LeaveCluster);
 
     await guild.remove();
 
     return message.reply(
-      `Guild '${discordGuild.name}' removed from cluster '${guild.cluster.name}' (${guild.cluster.publicClusterId}) 💀`
+      `Guild '${message.guild?.name}' removed from cluster ${cluster.displayString()} 💀`
     );
   }
 }

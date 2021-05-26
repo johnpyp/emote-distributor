@@ -1,19 +1,13 @@
 import { BaseEntity, Entity, ManyToOne, PrimaryColumn } from "typeorm";
-import { Cluster } from "./Cluster";
+import { ClusterUser } from "./ClusterUser";
 
 @Entity()
 export class User extends BaseEntity {
   @PrimaryColumn()
   public id: string;
 
-  @ManyToOne(() => Cluster, (cluster) => cluster.owner)
-  public ownedClusters: Cluster[];
-
-  @ManyToOne(() => Cluster, (cluster) => cluster.admins)
-  public adminClusters: Cluster[];
-
-  @ManyToOne(() => Cluster, (cluster) => cluster.moderators)
-  public moderatorClusters: Cluster[];
+  @ManyToOne(() => ClusterUser, (clusterUser) => clusterUser.user)
+  public clusterUsers: ClusterUser[];
 
   static async findOrCreate(authorId: string): Promise<User> {
     const foundUser = await User.findOne(authorId);

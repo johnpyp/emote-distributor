@@ -1,27 +1,27 @@
 import { Message } from "discord.js";
 import { Cluster } from "../../../entities/Cluster";
 import { Command } from "../../command";
+import { guardPermissions, Permission } from "../../permissions";
 
-export class ClusterDeleteCommand extends Command {
-  constructor() {
-    super("cluster:delete", { aliases: [], guildOnly: true });
+export class ClusterDelete extends Command {
+  constructor(id: string) {
+    super(id, { aliases: [], guildOnly: true });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
-    const [clusterId] = args;
-    if (!clusterId) return message.reply("No cluster id provided ❌");
+    const [publicClusterId] = args;
 
-    if (!/^[a-z-]+$/.test(clusterId))
-      return message.reply("Cluster id can only contain lowercase letters and hyphens (-) ❌");
+    Cluster.publicClusterIdGuard(publicClusterId);
 
-    const cluster = await Cluster.findOne({ publicClusterId: clusterId });
-    if (!cluster) return message.reply(`Cluster '${clusterId}' doesn't exist ❌`);
+    const { cluster, role } = await Cluster.getPublicClusterAndRoleGuard(
+      publicClusterId,
+      message.author.id
+    );
 
-    if (!cluster.isOwner(message.author.id))
-      return message.reply(`You do not have permission to delete this cluster ❌`);
+    guardPermissions(role, Permission.DeleteCluster);
 
     await cluster.remove();
 
-    return message.reply(`Cluster ${cluster.publicClusterId} has been deleted! 💀`);
+    return message.reply(`Cluster ${cluster.displayString()} has been deleted 💀`);
   }
 }

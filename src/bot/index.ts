@@ -21,6 +21,7 @@ export class Bot {
     this.commandHandler = new CommandHandler({
       client,
       defaultPrefix: "?",
+      admins: ["151518034043863040"],
     });
   }
 

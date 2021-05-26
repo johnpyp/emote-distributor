@@ -2,43 +2,40 @@ import { Message } from "discord.js";
 import { Cluster } from "../../../entities/Cluster";
 import { Guild } from "../../../entities/Guild";
 import { Command } from "../../command";
+import { guardPermissions, Permission } from "../../permissions";
+import { UserError } from "../../util";
 
-export class ClusterJoinCommand extends Command {
-  constructor() {
-    super("cluster:join", { aliases: [], guildOnly: true });
+export class ClusterJoin extends Command {
+  constructor(id: string) {
+    super(id, { aliases: [], guildOnly: true });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
+    const [publicClusterId] = args;
     const discordGuild = message.guild;
     if (!discordGuild) return;
 
-    const [clusterId] = args;
-    if (!clusterId) return message.reply("No cluster id provided ❌");
-
-    if (!/^[a-z-]+$/.test(clusterId))
-      return message.reply("Cluster id can only contain lowercase letters and hyphens (-) ❌");
-
-    const cluster = await Cluster.findOne(
-      { publicClusterId: clusterId },
-      { relations: ["guilds"] }
+    const { cluster, role } = await Cluster.getPublicClusterAndRoleGuard(
+      publicClusterId,
+      message.author.id
     );
-    if (!cluster) return message.reply(`Cluster '${clusterId}' doesn't exist ❌`);
 
-    if (!cluster.isAdmin(message.author.id) || !message.member?.hasPermission(["MANAGE_GUILD"]))
-      return message.reply(`You do not have permission to join this cluster with this server ❌`);
+    guardPermissions(role, Permission.JoinCluster);
+    if (!message.member?.hasPermission(["MANAGE_GUILD"]))
+      throw new UserError(`Insufficient permissions ❌`);
 
     if (await Guild.findOne(discordGuild.id))
       return message.reply("Guild already part of a cluster ❌");
 
-    await Guild.create({
+    const guild = Guild.create({
       id: discordGuild.id,
-      cluster,
-    }).save();
+    });
 
-    await cluster.reload();
+    cluster.guilds.push(guild);
+    cluster.save();
 
     return message.reply(
-      `Guild '${discordGuild.name}' is now a part of cluster '${cluster.name}' (${cluster.publicClusterId}) 🚀`
+      `${discordGuild.name} is now a part of cluster ${cluster.displayString()} 🚀`
     );
   }
 }
