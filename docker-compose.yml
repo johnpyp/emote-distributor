@@ -12,5 +12,5 @@ services:
       - BOT_TOKEN=${BOT_TOKEN}
     init: true
     volumes:
-      - ${HOST_SQL_PATH:-./data/db}:/workspace/data/sql
+      - ${HOST_DB_PATH:-./data/db}:/workspace/data/db
     restart: unless-stopped
