@@ -1,25 +1,7 @@
-/* eslint-disable max-classes-per-file */
-import {
-  Client,
-  Collection,
-  Emoji,
-  Guild as DiscordGuild,
-  GuildEmoji,
-  Message,
-  User as DiscordUser,
-} from "discord.js";
+import { Collection, GuildEmoji, Message, Guild as DiscordGuild } from "discord.js";
 import _ from "lodash";
 import path from "path";
-
-export class BaseError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = this.constructor.name;
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-
-export class UserError extends BaseError {}
+import { ArgsError, UserError } from "./errors";
 
 export const VALID_EMOTE_REGEX = /^[a-zA-Z0-9_]{2,}$/;
 export const EMOTE_REGEX = /(:|;)(?<name>\w{2,32})\1|(?<newline>\n)/g;
@@ -63,10 +45,10 @@ export interface EmoteData {
   url: string;
   animated: boolean;
 }
-export function parseEmoteData(message: Message, args: string[]): EmoteData {
+export function parseNewEmoteArgs(message: Message, args: string[]): EmoteData {
   if (message.attachments.size > 0) {
     const attachment = message.attachments.first();
-    if (!attachment) throw new UserError("Unknown error");
+    if (!attachment) throw new Error("First attachment doesn't exist");
     const name = formatEmoteFilename(args.length > 0 ? args.join("") : attachment.name);
     return {
       name,
@@ -99,7 +81,7 @@ export function parseEmoteData(message: Message, args: string[]): EmoteData {
     return { name, url, animated: parsed.animated };
   }
 
-  throw new UserError("Message had no name or emote");
+  throw new ArgsError("No emote or name provided ❌");
 }
 
 export interface ParsedCustomEmoji {
@@ -182,25 +164,4 @@ export function getEmojiUsage(discordGuild: DiscordGuild): EmojiUsage {
     totalPerc: (animatedCount + staticCount) / (staticLimit + animatedLimit),
     totalFull: animatedCount + staticCount >= staticLimit + animatedLimit,
   };
-}
-
-export function displayPercentage(decimal: number): string {
-  const percNumber = (decimal * 100).toFixed(2);
-  return `${percNumber}%`;
-}
-
-export function getUserFromMention(client: Client, arg: string): DiscordUser | null {
-  if (!arg) return null;
-
-  let mention = arg;
-  if (arg.startsWith("<@") && arg.endsWith(">")) {
-    mention = mention.slice(2, -1);
-
-    if (mention.startsWith("!")) {
-      mention = mention.slice(1);
-    }
-
-    return client.users.cache.get(mention) ?? null;
-  }
-  return null;
 }

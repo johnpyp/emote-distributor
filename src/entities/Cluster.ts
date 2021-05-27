@@ -2,7 +2,7 @@ import { Client, Collection, Guild as DiscordGuild, Util } from "discord.js";
 import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Guild } from "./Guild";
 import { ClusterUser } from "./ClusterUser";
-import { UserError } from "../bot/util";
+import { ArgsError, UserError } from "../bot/util";
 import { Roles } from "../bot/permissions";
 
 @Entity()
@@ -100,7 +100,7 @@ export class Cluster extends BaseEntity {
   static publicClusterIdGuard(
     publicClusterId: string | undefined
   ): asserts publicClusterId is string {
-    if (!publicClusterId) throw new UserError("No cluster id provided ❌");
+    if (!publicClusterId) throw new ArgsError("No cluster id provided ❌");
 
     if (!/^[a-z-]+$/.test(publicClusterId))
       throw new UserError("Cluster id can only contain lowercase letters and hyphens (-) ❌");

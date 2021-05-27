@@ -10,51 +10,22 @@ import { EmoteAdd } from "./commands/emote/add";
 import { EmoteList } from "./commands/emote/list";
 import { EmoteRemove } from "./commands/emote/remove";
 import { EmoteRename } from "./commands/emote/rename";
+import { Help } from "./commands/help";
 import { Ping } from "./commands/ping";
-import { SubcommandHandler } from "./subcommand";
 
 export function registerCommands(handler: CommandHandler): void {
-  handler.register(new Ping("ping"));
-  handler.register(new ClusterCreate("cluster:create"));
-  handler.register(new ClusterDelete("cluster:delete"));
-  handler.register(new ClusterJoin("cluster:join"));
-  handler.register(new ClusterLeave("cluster:leave"));
-  handler.register(new ClusterInfo("cluster:info"));
-  handler.register(new ClusterSetRole("cluster:set-role"));
-  handler.register(new ClusterClearRole("cluster:clear-role"));
+  handler.register(new Ping());
+  handler.register(new Help(handler.commandStore));
+  handler.register(new ClusterCreate());
+  handler.register(new ClusterDelete());
+  handler.register(new ClusterJoin());
+  handler.register(new ClusterLeave());
+  handler.register(new ClusterInfo());
+  handler.register(new ClusterSetRole());
+  handler.register(new ClusterClearRole());
 
-  handler.register(
-    new SubcommandHandler(
-      "cluster",
-      {
-        create: "cluster:create",
-        delete: "cluster:delete",
-        join: "cluster:join",
-        leave: "cluster:leave",
-        info: "cluster:info",
-        "set-role": "cluster:set-role",
-        "clear-role": "cluster:clear-role",
-      },
-      { aliases: ["cluster"] }
-    )
-  );
-
-  handler.register(new EmoteAdd("emote:add"));
-  handler.register(new EmoteRemove("emote:remove"));
-  handler.register(new EmoteList("emote:list"));
-  handler.register(new EmoteRename("emote:rename"));
-
-  handler.register(
-    new SubcommandHandler(
-      "emote",
-      {
-        add: "emote:add",
-        remove: "emote:remove",
-        delete: "emote:remove",
-        list: "emote:list",
-        rename: "emote:rename",
-      },
-      { aliases: ["emote"] }
-    )
-  );
+  handler.register(new EmoteAdd());
+  handler.register(new EmoteRemove());
+  handler.register(new EmoteList());
+  handler.register(new EmoteRename());
 }

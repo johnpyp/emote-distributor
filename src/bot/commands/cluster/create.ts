@@ -7,12 +7,18 @@ import { Command } from "../../command";
 import { Roles } from "../../permissions";
 
 export class ClusterCreate extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "cluster:create",
+      aliases: ["cluster create"],
+      guildOnly: true,
+      argsFormat: ["<cluster id> [cluster name...]"],
+      description: "Create a emote cluster with the given id and optional name",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
-    const [publicClusterId, clusterName] = args;
+    const [publicClusterId, ...clusterNameArgs] = args;
 
     Cluster.publicClusterIdGuard(publicClusterId);
 
@@ -21,6 +27,7 @@ export class ClusterCreate extends Command {
 
     const user = await User.findOrCreate(message.author.id);
 
+    const clusterName = clusterNameArgs.length >= 1 ? clusterNameArgs.join(" ").trim() : undefined;
     const cluster = await Cluster.create({
       name: clusterName ?? _.startCase(_.toLower(publicClusterId)),
       publicClusterId,
@@ -29,8 +36,11 @@ export class ClusterCreate extends Command {
       emoteManagersCanModerate: true,
     }).save();
 
-    const clusterUser = ClusterUser.create({ user, cluster, role: Roles.ClusterOwner });
-    await clusterUser.save();
+    await ClusterUser.create({
+      user,
+      cluster,
+      role: Roles.ClusterOwner,
+    }).save();
 
     return message.reply(`Cluster ${cluster.displayString()} created 🚀`);
   }

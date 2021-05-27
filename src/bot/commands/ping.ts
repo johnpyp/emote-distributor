@@ -3,8 +3,14 @@ import { logger } from "../../logger";
 import { Command } from "../command";
 
 export class Ping extends Command {
-  constructor(id: string) {
-    super(id, { aliases: ["ping"], guildOnly: true });
+  constructor() {
+    super({
+      id: "ping",
+      aliases: ["ping"],
+      guildOnly: true,
+      argsFormat: [""],
+      description: "Pong! (bot healthcheck)",
+    });
   }
 
   async exec(message: Message): Promise<void> {

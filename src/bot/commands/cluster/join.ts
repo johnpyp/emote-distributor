@@ -6,8 +6,15 @@ import { guardPermissions, Permission } from "../../permissions";
 import { UserError } from "../../util";
 
 export class ClusterJoin extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "cluster:join",
+      aliases: ["cluster join"],
+      guildOnly: true,
+      argsFormat: ["<cluster id>"],
+      description:
+        "Join this guild to a cluster with given id. Requires cluster manager permissions and permission to manage guild for the joining guild.",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {

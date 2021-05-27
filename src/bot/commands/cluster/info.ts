@@ -5,8 +5,14 @@ import { guardPermissions, Permission } from "../../permissions";
 import { displayPercentage, getEmojiUsage } from "../../util";
 
 export class ClusterInfo extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "cluster:info",
+      aliases: ["cluster info"],
+      guildOnly: true,
+      argsFormat: [""],
+      description: "Get stats about the guilds and emotes within this cluster",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<void> {

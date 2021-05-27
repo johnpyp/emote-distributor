@@ -3,19 +3,26 @@ import { Cluster } from "../../../entities/Cluster";
 import { ClusterUser } from "../../../entities/ClusterUser";
 import { Command } from "../../command";
 import { guardPermissions, Permission, Roles } from "../../permissions";
-import { getUserFromMention, UserError } from "../../util";
+import { ArgsError, getUserFromMention, UserError } from "../../util";
 
 const clearRolePermissionGroup: Record<string, Permission[]> = {
   [Roles.ClusterManager]: [Permission.OverrideManager],
   [Roles.ClusterModerator]: [Permission.OverrideModerator],
 };
 export class ClusterClearRole extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "cluster:clear-role",
+      aliases: ["cluster clear-role"],
+      guildOnly: true,
+      argsFormat: ["<user mention>"],
+      description: "Clear any roles and permissions for this Guild's cluster from a user",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
     const [userArg] = args;
+    if (!userArg) throw new ArgsError("No user mentioned ❌");
     const { cluster, role } = await Cluster.getImplicitClusterAndRoleGuard(
       message.guild?.id,
       message.author.id

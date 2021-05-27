@@ -6,7 +6,7 @@ export class User extends BaseEntity {
   @PrimaryColumn()
   public id: string;
 
-  @ManyToOne(() => ClusterUser, (clusterUser) => clusterUser.user)
+  @ManyToOne(() => ClusterUser, (clusterUser) => clusterUser.user, { cascade: true })
   public clusterUsers: ClusterUser[];
 
   static async findOrCreate(authorId: string): Promise<User> {

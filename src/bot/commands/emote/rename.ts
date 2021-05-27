@@ -4,15 +4,24 @@ import { Cluster } from "../../../entities/Cluster";
 import { logger } from "../../../logger";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
-import { resolveEmote, VALID_EMOTE_REGEX } from "../../util";
+import { ArgsError, resolveEmote, VALID_EMOTE_REGEX } from "../../util";
 
 export class EmoteRename extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "emote:rename",
+      aliases: ["emote rename"],
+      guildOnly: true,
+      argsFormat: ["<emote | emote name> <new emote name>"],
+      description: "Rename a given emote or emote name in the cluster to a new name.",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
-    const [targetEmoteName, emoteName] = args;
+    const [targetEmoteName, newEmoteName] = args;
+    if (!targetEmoteName) throw new ArgsError("No emote or emote name provided ❌");
+    if (!newEmoteName) throw new ArgsError("No new emote name provided ❌");
+
     const { cluster, role } = await Cluster.getImplicitClusterAndRoleGuard(
       message.guild?.id,
       message.author.id
@@ -30,18 +39,18 @@ export class EmoteRename extends Command {
     const targetEmote = await resolveEmote(guilds, targetEmoteName);
     const oldName = targetEmote.name;
 
-    const newName = _.trim(emoteName, ":");
-    const isValidName = VALID_EMOTE_REGEX.test(newName);
+    const cleanNewName = _.trim(newEmoteName, ":");
+    const isValidName = VALID_EMOTE_REGEX.test(cleanNewName);
     if (!isValidName)
       return message.reply(
         "Emote name is formatted incorrectly: only letters, numbers, and underscores are allowed ❌"
       );
 
     try {
-      await targetEmote.edit({ name: newName }, "Renamed by bot");
+      await targetEmote.edit({ name: cleanNewName }, "Renamed by bot");
       return await message.reply(
         `Renamed :${Util.escapeMarkdown(oldName)}: to :${Util.escapeMarkdown(
-          newName
+          cleanNewName
         )}: in ${cluster.displayString()}: ${targetEmote}`
       );
     } catch (e) {

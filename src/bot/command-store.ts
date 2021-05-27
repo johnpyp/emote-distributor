@@ -1,9 +1,10 @@
 import { Command } from "./command";
+import { PrefixRouter } from "./prefix-router";
 
 export class CommandStore {
   private commands: Map<string, Command> = new Map();
 
-  private aliases: Map<string, string> = new Map();
+  private aliases: PrefixRouter<string> = new PrefixRouter();
 
   public register(command: Command): void {
     const { id } = command;
@@ -11,7 +12,7 @@ export class CommandStore {
 
     this.commands.set(id, command);
     command.aliases.forEach((alias) => {
-      this.aliases.set(alias, id);
+      this.aliases.set(alias.split(" "), id);
     });
   }
 
@@ -21,7 +22,7 @@ export class CommandStore {
 
     this.commands.delete(id);
     command.aliases.forEach((alias) => {
-      if (this.aliases.get(alias) === id) this.aliases.delete(id);
+      this.aliases.delete(alias.split(" "));
     });
   }
 
@@ -30,12 +31,18 @@ export class CommandStore {
     return this.commands.get(id);
   }
 
-  public aliasFind(id: string | undefined): Command | undefined {
-    if (!id) return;
-    const foundAlias = this.aliases.get(id);
+  public aliasFind(args: string[] | undefined): Command | Command[] | undefined {
+    if (!args) return;
+    const foundAlias = this.aliases.search(args);
     if (!foundAlias) return;
 
-    return this.commands.get(id);
+    if (Array.isArray(foundAlias)) {
+      return foundAlias
+        .map((alias) => this.commands.get(alias))
+        .flatMap((command) => command ?? []);
+    }
+
+    return this.commands.get(foundAlias);
   }
 
   public list(): Command[] {

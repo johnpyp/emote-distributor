@@ -4,8 +4,16 @@ import { Command } from "../../command";
 import { guardPermissions, Permission } from "../../permissions";
 
 export class ClusterLeave extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "cluster:leave",
+      aliases: ["cluster leave"],
+      guildOnly: true,
+
+      argsFormat: [""],
+      description:
+        "Leave this guild from the cluster it's currently apart of. Requires cluster manager permissions.",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {

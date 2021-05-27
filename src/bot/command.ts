@@ -2,6 +2,29 @@ import { Client, Message } from "discord.js";
 
 export interface CommandOptions {
   /**
+   * Unique id identifying the command
+   */
+  id: string;
+
+  /**
+   * Args structure for help commands
+   *
+   * e.g ["<emote name> <emote | url | attachment>", "<emote>"]
+   *
+   *
+   */
+  argsFormat: string[];
+
+  /**
+   * Description of the command for help commands
+   *
+   * e.g "Add an emote with chosen name, along with a source emote you already have, a url to an image/gif, or attachment with the image or gif"
+   *
+   *
+   */
+  description: string;
+
+  /**
    * Whether this command only works in a guild text channel
    *
    * Default: false
@@ -45,10 +68,16 @@ export abstract class Command {
 
   public userCooldown: number;
 
-  public subCommands?: Map<string, string>;
+  public argsFormat: string[];
 
-  constructor(id: string, opts: CommandOptions = {}) {
-    this.id = id;
+  public description: string;
+
+  constructor(opts: CommandOptions) {
+    this.id = opts.id;
+
+    this.argsFormat = opts.argsFormat;
+    this.description = opts.description;
+
     this.aliases = opts.aliases ?? [];
     this.guildOnly = opts.guildOnly ?? false;
 

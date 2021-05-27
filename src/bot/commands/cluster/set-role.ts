@@ -10,19 +10,28 @@ import {
   roleNames,
   Roles,
 } from "../../permissions";
-import { getUserFromMention, UserError } from "../../util";
+import { ArgsError, getUserFromMention, UserError } from "../../util";
 
 const setRolePermissionGroups: Record<string, Permission[]> = {
   [Roles.ClusterManager]: [Permission.OverrideManager],
   [Roles.ClusterModerator]: [Permission.OverrideModerator],
 };
 export class ClusterSetRole extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "cluster:set-role",
+      aliases: ["cluster set-role"],
+      guildOnly: true,
+      argsFormat: ["<user mention> <moderator | manager> "],
+      description:
+        "Give cluster permissions to another user. Can only give a role lower than your own.",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
     const [userArg, roleType] = args;
+    if (!userArg) throw new ArgsError("No user mentioned ❌");
+    if (!roleType) throw new ArgsError("No role provided ❌");
     const { cluster, role } = await Cluster.getImplicitClusterAndRoleGuard(
       message.guild?.id,
       message.author.id

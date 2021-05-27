@@ -4,8 +4,14 @@ import { Command } from "../../command";
 import { guardPermissions, Permission } from "../../permissions";
 
 export class ClusterDelete extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "cluster:delete",
+      aliases: ["cluster delete"],
+      guildOnly: true,
+      argsFormat: ["<cluster id>"],
+      description: "Delete the cluster with given id, if you're the cluster owner",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {

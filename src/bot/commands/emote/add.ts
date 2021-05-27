@@ -3,11 +3,18 @@ import _ from "lodash";
 import { Cluster } from "../../../entities/Cluster";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
-import { getEmojiUsage, parseEmoteData, UserError, VALID_EMOTE_REGEX } from "../../util";
+import { getEmojiUsage, parseNewEmoteArgs, UserError, VALID_EMOTE_REGEX } from "../../util";
 
 export class EmoteAdd extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "emote:add",
+      aliases: ["emote add"],
+      guildOnly: true,
+      argsFormat: ["<emote name> <emote | url | attachment>", "<emote>"],
+      description:
+        "Add an emote to the cluster. Provide a name with a source emote, image/gif url, attachment image/gif. Alternatively provide just a source emote to clone it. Requires cluster moderator permissions.",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<unknown> {
@@ -23,7 +30,7 @@ export class EmoteAdd extends Command {
       return message.reply(`Insufficient permissions`);
     }
 
-    const { name, url, animated } = parseEmoteData(message, args);
+    const { name, url, animated } = parseNewEmoteArgs(message, args);
 
     const isValidName = VALID_EMOTE_REGEX.test(name);
     if (!isValidName)

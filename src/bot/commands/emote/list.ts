@@ -5,8 +5,14 @@ import { Command } from "../../command";
 import { guardPermissions, Permission } from "../../permissions";
 
 export class EmoteList extends Command {
-  constructor(id: string) {
-    super(id, { aliases: [], guildOnly: true });
+  constructor() {
+    super({
+      id: "emote:list",
+      aliases: ["emote list"],
+      guildOnly: true,
+      argsFormat: [""],
+      description: "List all the emotes in the cluster, as a big blob of messages.",
+    });
   }
 
   async exec(message: Message, args: string[]): Promise<void> {
