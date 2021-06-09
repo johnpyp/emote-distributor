@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import { BaseEntity, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { ClusterUser } from "./ClusterUser";
 
 @Entity()
@@ -6,7 +6,7 @@ export class User extends BaseEntity {
   @PrimaryColumn()
   public id: string;
 
-  @ManyToOne(() => ClusterUser, (clusterUser) => clusterUser.user, { cascade: true })
+  @OneToMany(() => ClusterUser, (clusterUser) => clusterUser.user, { cascade: true })
   public clusterUsers: ClusterUser[];
 
   static async findOrCreate(authorId: string): Promise<User> {

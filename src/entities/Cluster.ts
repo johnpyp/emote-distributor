@@ -1,5 +1,5 @@
 import { Client, Collection, Guild as DiscordGuild, Util } from "discord.js";
-import { BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Guild } from "./Guild";
 import { ClusterUser } from "./ClusterUser";
 import { ArgsError, UserError } from "../bot/util";
@@ -22,7 +22,7 @@ export class Cluster extends BaseEntity {
   })
   public guilds: Guild[];
 
-  @ManyToOne(() => ClusterUser, (clusterUser) => clusterUser.cluster, {
+  @OneToMany(() => ClusterUser, (clusterUser) => clusterUser.cluster, {
     cascade: true,
     eager: true,
   })

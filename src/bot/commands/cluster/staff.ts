@@ -29,9 +29,8 @@ export class ClusterStaff extends Command {
 
     guardPermissions(role, [Permission.ClusterStaff]);
 
-    const clusterUsers = await ClusterUser.find({ where: { clusterId: cluster.id } });
-    console.log({ cluster, clusterUsers });
-    const staff = clusterUsers.filter((u) => u.role !== Roles.Anonymous);
+    console.log({ cluster });
+    const staff = cluster.clusterUsers.filter((u) => u.role !== Roles.Anonymous);
 
     const sendMessage: string[] = [`**Cluster Staff**: ${cluster.displayString()}`, ``];
 
