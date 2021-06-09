@@ -2,7 +2,7 @@ import { CommandHandler } from "./command-handler";
 import { ClusterClearRole } from "./commands/cluster/clear-role";
 import { ClusterCreate } from "./commands/cluster/create";
 import { ClusterDelete } from "./commands/cluster/delete";
-import { ClusterInfo } from "./commands/cluster/info";
+import { ClusterStats } from "./commands/cluster/stats";
 import { ClusterJoin } from "./commands/cluster/join";
 import { ClusterLeave } from "./commands/cluster/leave";
 import { ClusterSetRole } from "./commands/cluster/set-role";
@@ -12,6 +12,7 @@ import { EmoteRemove } from "./commands/emote/remove";
 import { EmoteRename } from "./commands/emote/rename";
 import { Help } from "./commands/help";
 import { Ping } from "./commands/ping";
+import { ClusterStaff } from "./commands/cluster/staff";
 
 export function registerCommands(handler: CommandHandler): void {
   handler.register(new Ping());
@@ -20,9 +21,10 @@ export function registerCommands(handler: CommandHandler): void {
   handler.register(new ClusterDelete());
   handler.register(new ClusterJoin());
   handler.register(new ClusterLeave());
-  handler.register(new ClusterInfo());
+  handler.register(new ClusterStats());
   handler.register(new ClusterSetRole());
   handler.register(new ClusterClearRole());
+  handler.register(new ClusterStaff());
 
   handler.register(new EmoteAdd());
   handler.register(new EmoteRemove());

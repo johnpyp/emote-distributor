@@ -89,7 +89,7 @@ export class CommandHandler {
   }
 
   private async handleOnlySubcommands(commands: Command[], parsed: ParsedMessage): Promise<void> {
-    const help = formatSubcommandHelp(commands);
+    const help = formatSubcommandHelp(commands, parsed.args);
     await parsed.message.reply(help, { split: true });
   }
 

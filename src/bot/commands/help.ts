@@ -22,19 +22,5 @@ export class Help extends Command {
     const commands = this.commandStore.list();
     responseMessage.push(...formatManyHelp(commands));
     await message.reply(responseMessage, { split: true });
-
-    // this.commandStore.list().forEach((command) => {
-    //   if (command.subCommands) const help = formatHelp(s, possibleArgs, description);
-    // });
-    //
-    // logger.verbose("Received ping");
-    // const sent = await message.reply("Pong!");
-    // const timeDiff =
-    //   (sent.editedAt?.valueOf() || sent.createdAt?.valueOf()) -
-    //   (message.editedAt?.valueOf() || message.createdAt?.valueOf());
-    // await message.reply([
-    //   `🔂 **RTT**: ${timeDiff} ms`,
-    //   `💟 **Heartbeat**: ${Math.round(this.client.ws.ping)} ms`,
-    // ]);
   }
 }

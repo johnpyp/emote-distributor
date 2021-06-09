@@ -4,11 +4,11 @@ import { Command } from "../../command";
 import { guardPermissions, Permission } from "../../permissions";
 import { displayPercentage, getEmojiUsage } from "../../util";
 
-export class ClusterInfo extends Command {
+export class ClusterStats extends Command {
   constructor() {
     super({
-      id: "cluster:info",
-      aliases: ["cluster info"],
+      id: "cluster:stats",
+      aliases: ["cluster stats", "emote stats", "cluster summary", "emote summary"],
       guildOnly: true,
       argsFormat: [""],
       description: "Get stats about the guilds and emotes within this cluster",
@@ -21,13 +21,13 @@ export class ClusterInfo extends Command {
       message.author.id
     );
 
-    guardPermissions(role, [Permission.ClusterInfo]);
+    guardPermissions(role, [Permission.ClusterStats]);
 
     const guilds = cluster.getDiscordGuilds(this.client);
     const usages = guilds.map((guild) => getEmojiUsage(guild));
     const emotes = guilds.flatMap((guild) => guild.emojis.cache);
 
-    const sendMessage: string[] = [`**Cluster Info**: ${cluster.displayString()}`];
+    const sendMessage: string[] = [`**Cluster Stats**: ${cluster.displayString()}`];
 
     sendMessage.push(``, `**Guilds**: ${guilds.size}`);
     usages.forEach((usage) => {
@@ -42,5 +42,3 @@ export class ClusterInfo extends Command {
     await message.channel.send(sendMessage);
   }
 }
-
-function getEmojiLimit(premiumTier: number) {}

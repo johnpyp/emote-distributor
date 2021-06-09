@@ -22,7 +22,7 @@ export class ClusterSetRole extends Command {
       id: "cluster:set-role",
       aliases: ["cluster set-role"],
       guildOnly: true,
-      argsFormat: ["<user mention> <moderator | manager> "],
+      argsFormat: ["<user mention> <moderator | manager>"],
       description:
         "Give cluster permissions to another user. Can only give a role lower than your own.",
     });

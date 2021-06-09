@@ -13,7 +13,7 @@ export class EmoteAdd extends Command {
       guildOnly: true,
       argsFormat: ["<emote name> <emote | url | attachment>", "<emote>"],
       description:
-        "Add an emote to the cluster. Provide a name with a source emote, image/gif url, attachment image/gif. Alternatively provide just a source emote to clone it. Requires cluster moderator permissions.",
+        "Add an emote to the cluster. Provide a name with a source emote, image/gif url, or attachment image/gif.",
     });
   }
 

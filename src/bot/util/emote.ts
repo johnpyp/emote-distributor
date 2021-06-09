@@ -1,6 +1,7 @@
 import { Collection, GuildEmoji, Message, Guild as DiscordGuild } from "discord.js";
 import _ from "lodash";
 import path from "path";
+import invariant from "tiny-invariant";
 import { ArgsError, UserError } from "./errors";
 
 export const VALID_EMOTE_REGEX = /^[a-zA-Z0-9_]{2,}$/;
@@ -48,7 +49,7 @@ export interface EmoteData {
 export function parseNewEmoteArgs(message: Message, args: string[]): EmoteData {
   if (message.attachments.size > 0) {
     const attachment = message.attachments.first();
-    if (!attachment) throw new Error("First attachment doesn't exist");
+    invariant(attachment, "First attachment doesn't exist");
     const name = formatEmoteFilename(args.length > 0 ? args.join("") : attachment.name);
     return {
       name,

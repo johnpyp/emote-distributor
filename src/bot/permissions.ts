@@ -12,8 +12,8 @@ export enum Permission {
   LeaveCluster,
   CreateCluster,
   DeleteCluster,
-  ClusterInfo,
-  ClusterStatus,
+  ClusterStats,
+  ClusterStaff,
 
   AddEmote,
   RemoveEmote,
@@ -45,13 +45,12 @@ export const roleDisplaynames: Record<Roles, string> = {
 
 export const anonymousPermissions = [
   Permission.CreateCluster,
-  Permission.ClusterInfo,
+  Permission.ClusterStats,
+  Permission.ClusterStaff,
   Permission.ListEmotes,
 ];
 export const clusterModeratorPermissions = [
   ...anonymousPermissions,
-
-  Permission.ClusterStatus,
 
   Permission.AddEmote,
   Permission.RemoveEmote,
@@ -79,6 +78,14 @@ export const permissionMap = {
   [Roles.ClusterModerator]: clusterModeratorPermissions,
   [Roles.Anonymous]: anonymousPermissions,
   [Roles.BotOwner]: botOwnerPermissions,
+};
+
+export const hierarchyMap = {
+  [Roles.ClusterOwner]: 1,
+  [Roles.ClusterManager]: 2,
+  [Roles.ClusterModerator]: 3,
+  [Roles.Anonymous]: 4,
+  [Roles.BotOwner]: 5,
 };
 
 export function checkPermissions(role: Roles, permissions: Permission | Permission[]): boolean {
