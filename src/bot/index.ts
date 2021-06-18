@@ -20,7 +20,7 @@ export class Bot {
     this.client = client;
     this.commandHandler = new CommandHandler({
       client,
-      defaultPrefix: "?",
+      defaultPrefix: "!",
       admins: ["151518034043863040"],
     });
   }
