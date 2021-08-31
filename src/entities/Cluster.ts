@@ -2,8 +2,8 @@ import { Client, Collection, Guild as DiscordGuild, Util } from "discord.js";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Guild } from "./Guild";
 import { ClusterUser } from "./ClusterUser";
-import { ArgsError, UserError } from "../bot/util";
 import { Roles } from "../bot/permissions";
+import { ArgsError, UserError } from "../errors";
 
 @Entity()
 export class Cluster extends BaseEntity {
@@ -45,22 +45,6 @@ export class Cluster extends BaseEntity {
 
   public displayString(): string {
     return Util.escapeMarkdown(`${this.name} (${this.publicClusterId})`);
-  }
-
-  static async getClusterByGuild(guildId?: string): Promise<Cluster | null> {
-    if (!guildId) return null;
-    const cluster = await Cluster.findOne(
-      {},
-      {
-        where: {
-          guilds: {
-            id: guildId,
-          },
-        },
-        relations: ["guilds", "clusterUsers"],
-      }
-    );
-    return cluster ?? null;
   }
 
   static async getClusterUserRole(clusterId: string, userId: string): Promise<Roles> {

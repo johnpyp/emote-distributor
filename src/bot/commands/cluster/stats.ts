@@ -39,6 +39,6 @@ export class ClusterStats extends Command {
     const overallCapacity = usages.reduce((total, usage) => total + usage.totalLimit, 0);
     const overallPerc = displayPercentage(emotes.size / overallCapacity);
     sendMessage.push(``, `**Total**: ${emotes.size} / ${overallCapacity} (${overallPerc})`);
-    await message.channel.send(sendMessage);
+    await message.channel.send(sendMessage.join("\n"));
   }
 }

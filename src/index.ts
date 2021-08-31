@@ -1,4 +1,5 @@
-import { Bot } from "./bot";
+import "reflect-metadata";
+import { Bot } from "./bot/index";
 import { appConfig } from "./app-config";
 import { initializeDatabase } from "./database";
 

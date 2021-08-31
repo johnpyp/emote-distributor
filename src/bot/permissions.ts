@@ -1,4 +1,4 @@
-import { UserError } from "./util";
+import { UserError } from "../errors";
 
 export enum Permission {
   DISALLOWED,

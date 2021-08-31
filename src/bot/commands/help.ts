@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, Util } from "discord.js";
 import { Command } from "../command";
 import { CommandStore } from "../command-store";
 import { formatManyHelp } from "../util";
@@ -21,6 +21,8 @@ export class Help extends Command {
     const responseMessage: string[] = ["**Emote Distributor Commands**", ""];
     const commands = this.commandStore.list();
     responseMessage.push(...formatManyHelp(commands));
-    await message.reply(responseMessage, { split: true });
+    for (const part of Util.splitMessage(responseMessage.join("\n"))) {
+      await message.reply(part);
+    }
   }
 }

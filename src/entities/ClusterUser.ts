@@ -12,10 +12,10 @@ export class ClusterUser extends BaseEntity {
   public clusterId: string;
 
   @ManyToOne(() => User, (user) => user.clusterUsers, { onDelete: "CASCADE" })
-  public user!: User;
+  public user: User;
 
   @ManyToOne(() => Cluster, (cluster) => cluster.clusterUsers, { onDelete: "CASCADE" })
-  public cluster!: User;
+  public cluster: Cluster;
 
   @Column({ type: "text" })
   public role: Roles;

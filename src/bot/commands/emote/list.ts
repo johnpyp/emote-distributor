@@ -26,13 +26,15 @@ export class EmoteList extends Command {
     const guilds = cluster.getDiscordGuilds(this.client);
     const emotes = guilds.flatMap((guild) => guild.emojis.cache);
 
-    await message.channel.send([`**All Emotes**: ${cluster.displayString()}`]);
+    await message.channel.send(`**All Emotes**: ${cluster.displayString()}`);
     if (emotes.size > 0) {
       const emotePayload = _.chunk(
         emotes.map((emote) => emote.toString()),
         20
       ).map((chunk) => chunk.join(" "));
-      await message.channel.send(emotePayload, { split: true });
+      for (const chunk of emotePayload) {
+        await message.channel.send(chunk);
+      }
       return;
     }
     await message.channel.send("No emotes");

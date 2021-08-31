@@ -1,9 +1,9 @@
-import { Message } from "discord.js";
+import { Message, Permissions } from "discord.js";
 import { Cluster } from "../../../entities/Cluster";
 import { Guild } from "../../../entities/Guild";
+import { UserError } from "../../../errors";
 import { Command } from "../../command";
 import { guardPermissions, Permission } from "../../permissions";
-import { UserError } from "../../util";
 
 export class ClusterJoin extends Command {
   constructor() {
@@ -28,7 +28,7 @@ export class ClusterJoin extends Command {
     );
 
     guardPermissions(role, Permission.JoinCluster);
-    if (!message.member?.hasPermission(["MANAGE_GUILD"]))
+    if (!message.member?.permissions.has(Permissions.FLAGS.MANAGE_GUILD))
       throw new UserError(`Insufficient permissions ❌`);
 
     if (await Guild.findOne(discordGuild.id))

@@ -1,4 +1,5 @@
-import { Client } from "discord.js";
+import "reflect-metadata";
+import { Client, Intents } from "discord.js";
 import { logger } from "../logger";
 import { CommandHandler } from "./command-handler";
 import { registerCommands } from "./command-registry";
@@ -9,7 +10,14 @@ export class Bot {
   private commandHandler: CommandHandler;
 
   static async create(botToken: string): Promise<Bot> {
-    const client = new Client();
+    const client = new Client({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+      ],
+    });
     const bot = new Bot(client);
 
     await bot.initialize(botToken);

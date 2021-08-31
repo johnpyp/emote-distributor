@@ -11,6 +11,9 @@
     "format:prettier": "prettier --write \"{**/*,*}.{js,json,md,ts,yaml}\"",
     "lint": "eslint . --ext .js,.ts"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/johnpyp/emote-distributor.git"
@@ -22,35 +25,40 @@
   },
   "homepage": "https://github.com/johnpyp/emote-distributor#readme",
   "dependencies": {
-    "discord.js": "^12.5.3",
+    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/sdk-trace-node": "^0.24.1-alpha.4",
+    "discord.js": "^13.1.0",
     "fs-extra": "^10.0.0",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.1.13",
-    "sqlite": "^4.0.22",
+    "sqlite": "^4.0.23",
     "sqlite3": "^5.0.2",
     "superagent": "^6.1.0",
     "tiny-invariant": "^1.1.0",
-    "typeorm": "^0.2.32",
+    "typeorm": "^0.2.37",
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.170",
-    "@types/node": "^15.6.0",
-    "@types/superagent": "^4.1.11",
-    "@typescript-eslint/eslint-plugin": "4.24.0",
+    "@build-script/typescript-transformer-append-js-extension": "^1.0.4",
+    "@build-script/typescript-transformer-dual-package": "^1.0.21",
+    "@types/lodash": "^4.14.172",
+    "@types/node": "^16.7.8",
+    "@types/superagent": "^4.1.12",
+    "@typescript-eslint/eslint-plugin": "4.30.0",
+    "@typescript-eslint/parser": "^4.30.0",
     "dotenv": "^10.0.0",
-    "esbuild": "0.12.1",
-    "eslint": "7.27.0",
+    "esbuild": "0.12.24",
+    "eslint": "7.32.0",
     "eslint-config-airbnb-base": "14.2.1",
-    "eslint-config-airbnb-typescript": "12.3.1",
+    "eslint-config-airbnb-typescript": "14.0.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-import-resolver-typescript": "2.4.0",
-    "eslint-plugin-import": "2.23.3",
+    "eslint-plugin-import": "2.24.2",
     "eslint-plugin-jsx-a11y": "6.4.1",
-    "estrella": "1.4.1",
-    "prettier": "2.3.0",
+    "eslint-plugin-node": "^11.1.0",
+    "prettier": "2.3.2",
     "ts-eager": "^2.0.2",
-    "ts-node": "^9.1.1",
-    "typescript": "4.2.4"
+    "ts-node": "^10.2.1",
+    "typescript": "4.4.2"
   }
 }

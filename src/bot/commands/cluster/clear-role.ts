@@ -1,9 +1,10 @@
 import { Message } from "discord.js";
 import { Cluster } from "../../../entities/Cluster";
 import { ClusterUser } from "../../../entities/ClusterUser";
+import { ArgsError, UserError } from "../../../errors";
 import { Command } from "../../command";
 import { guardPermissions, Permission, Roles } from "../../permissions";
-import { ArgsError, getUserFromMention, UserError } from "../../util";
+import { getUserFromMention } from "../../util";
 
 const clearRolePermissionGroup: Record<string, Permission[]> = {
   [Roles.ClusterManager]: [Permission.OverrideManager],

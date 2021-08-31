@@ -1,8 +1,9 @@
 import { Message } from "discord.js";
 import { Cluster } from "../../../entities/Cluster";
+import { ArgsError } from "../../../errors";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
-import { ArgsError, resolveEmote } from "../../util";
+import { canManageEmoji, resolveEmote } from "../../util";
 
 export class EmoteRemove extends Command {
   constructor() {
@@ -22,8 +23,7 @@ export class EmoteRemove extends Command {
       message.guild?.id,
       message.author.id
     );
-    const manageEmojisCheck =
-      cluster.emoteManagersCanModerate && message.member?.hasPermission(["MANAGE_EMOJIS"]);
+    const manageEmojisCheck = canManageEmoji(cluster, message.member);
 
     if (!checkPermissions(role, [Permission.RemoveEmote]) && !manageEmojisCheck) {
       return message.reply(`Insufficient permissions ❌`);

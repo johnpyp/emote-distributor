@@ -2,7 +2,7 @@ import { Collection, GuildEmoji, Message, Guild as DiscordGuild } from "discord.
 import _ from "lodash";
 import path from "path";
 import invariant from "tiny-invariant";
-import { ArgsError, UserError } from "./errors";
+import { ArgsError, UserError } from "../../errors";
 
 export const VALID_EMOTE_REGEX = /^[a-zA-Z0-9_]{2,}$/;
 export const EMOTE_REGEX = /(:|;)(?<name>\w{2,32})\1|(?<newline>\n)/g;
@@ -105,7 +105,7 @@ export async function resolveEmote(
 
   const name = _.trim(nameOrEmote, ":");
   const possibleEmotes = discordGuilds.flatMap((discordGuild) =>
-    discordGuild.emojis.cache.filter((emoji) => emoji.name.toLowerCase() === name.toLowerCase())
+    discordGuild.emojis.cache.filter((emoji) => emoji?.name?.toLowerCase() === name.toLowerCase())
   );
 
   if (possibleEmotes && possibleEmotes.size >= 1) {
@@ -136,19 +136,19 @@ export interface EmojiUsage {
   totalPerc: number;
   totalFull: boolean;
 }
-const tierBoosts: Record<number, number> = {
-  0: 0,
-  1: 50,
-  2: 100,
-  3: 200,
-};
+const tierBoosts = {
+  NONE: 0,
+  TIER_1: 50,
+  TIER_2: 100,
+  TIER_3: 200,
+} as const;
 export function getEmojiUsage(discordGuild: DiscordGuild): EmojiUsage {
   const animatedLimit = 50;
   const staticBoost =
     discordGuild.premiumTier in tierBoosts ? tierBoosts[discordGuild.premiumTier] : 0;
   const staticLimit = staticBoost + 50;
 
-  const animatedCount = discordGuild.emojis.cache.filter((emoji) => emoji.animated).size;
+  const animatedCount = discordGuild.emojis.cache.filter((emoji) => emoji.animated ?? false).size;
   const staticCount = discordGuild.emojis.cache.filter((emoji) => !emoji.animated).size;
   return {
     guild: discordGuild,

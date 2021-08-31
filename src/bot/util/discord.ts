@@ -1,6 +1,15 @@
-import { Client, User as DiscordUser } from "discord.js";
+import {
+  Client,
+  GuildMember,
+  Permissions,
+  User as DiscordUser,
+} from "discord.js";
+import { Cluster } from "../../entities/Cluster";
 
-export function getUserFromMention(client: Client, arg: string): DiscordUser | null {
+export function getUserFromMention(
+  client: Client,
+  arg: string
+): DiscordUser | null {
   if (!arg) return null;
 
   let mention = arg;
@@ -14,4 +23,13 @@ export function getUserFromMention(client: Client, arg: string): DiscordUser | n
     return client.users.cache.get(mention) ?? null;
   }
   return null;
+}
+
+export function canManageEmoji(cluster: Cluster, member: GuildMember | null) {
+  if (!member) return false;
+
+  return (
+    cluster.emoteManagersCanModerate &&
+    member.permissions.has(Permissions.FLAGS.MANAGE_EMOJIS_AND_STICKERS)
+  );
 }

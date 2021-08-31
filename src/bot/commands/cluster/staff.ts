@@ -44,6 +44,6 @@ export class ClusterStaff extends Command {
       sendMessage.push(`<@${u.userId}> - ${roleDisplaynames[u.role]}`);
     });
 
-    await message.channel.send(sendMessage, { allowedMentions: { users: [] } });
+    await message.channel.send({ content: sendMessage.join("\n"), allowedMentions: { users: [] } });
   }
 }

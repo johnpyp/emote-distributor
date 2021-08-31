@@ -19,9 +19,11 @@ export class Ping extends Command {
     const timeDiff =
       (sent.editedAt?.valueOf() || sent.createdAt?.valueOf()) -
       (message.editedAt?.valueOf() || message.createdAt?.valueOf());
-    await message.reply([
-      `🔂 **RTT**: ${timeDiff} ms`,
-      `💟 **Heartbeat**: ${Math.round(this.client.ws.ping)} ms`,
-    ]);
+    await message.reply(
+      [
+        `🔂 **RTT**: ${timeDiff} ms`,
+        `💟 **Heartbeat**: ${Math.round(this.client.ws.ping)} ms`,
+      ].join("\n")
+    );
   }
 }

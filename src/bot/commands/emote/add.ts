@@ -1,9 +1,10 @@
 import { Message, Util } from "discord.js";
 import _ from "lodash";
 import { Cluster } from "../../../entities/Cluster";
+import { UserError } from "../../../errors";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
-import { getEmojiUsage, parseNewEmoteArgs, UserError, VALID_EMOTE_REGEX } from "../../util";
+import { canManageEmoji, getEmojiUsage, parseNewEmoteArgs, VALID_EMOTE_REGEX } from "../../util";
 
 export class EmoteAdd extends Command {
   constructor() {
@@ -23,8 +24,7 @@ export class EmoteAdd extends Command {
       message.author.id
     );
 
-    const manageEmojisCheck =
-      cluster.emoteManagersCanModerate && message.member?.hasPermission(["MANAGE_EMOJIS"]);
+    const manageEmojisCheck = canManageEmoji(cluster, message.member);
 
     if (!checkPermissions(role, [Permission.AddEmote]) && !manageEmojisCheck) {
       return message.reply(`Insufficient permissions`);
@@ -54,7 +54,9 @@ export class EmoteAdd extends Command {
     const emoji = await lowestUsage.guild.emojis.create(url, name);
 
     return message.reply(
-      `New emote :${Util.escapeMarkdown(emoji.name)}: added to ${cluster.displayString()}: ${emoji}`
+      `New emote :${Util.escapeMarkdown(
+        emoji.name ?? ""
+      )}: added to ${cluster.displayString()}: ${emoji}`
     );
   }
 }

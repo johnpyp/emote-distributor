@@ -1,10 +1,11 @@
-import { Message, Util } from "discord.js";
+import { Message, Util, Permissions } from "discord.js";
 import _ from "lodash";
 import { Cluster } from "../../../entities/Cluster";
+import { ArgsError } from "../../../errors";
 import { logger } from "../../../logger";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
-import { ArgsError, resolveEmote, VALID_EMOTE_REGEX } from "../../util";
+import { canManageEmoji, resolveEmote, VALID_EMOTE_REGEX } from "../../util";
 
 export class EmoteRename extends Command {
   constructor() {
@@ -27,8 +28,7 @@ export class EmoteRename extends Command {
       message.author.id
     );
 
-    const manageEmojisCheck =
-      cluster.emoteManagersCanModerate && message.member?.hasPermission(["MANAGE_EMOJIS"]);
+    const manageEmojisCheck = canManageEmoji(cluster, message.member);
 
     if (!checkPermissions(role, [Permission.RenameEmote]) && !manageEmojisCheck) {
       return message.reply(`Insufficient permissions`);
@@ -49,7 +49,7 @@ export class EmoteRename extends Command {
     try {
       await targetEmote.edit({ name: cleanNewName }, "Renamed by bot");
       return await message.reply(
-        `Renamed :${Util.escapeMarkdown(oldName)}: to :${Util.escapeMarkdown(
+        `Renamed :${Util.escapeMarkdown(oldName || "")}: to :${Util.escapeMarkdown(
           cleanNewName
         )}: in ${cluster.displayString()}: ${targetEmote}`
       );
