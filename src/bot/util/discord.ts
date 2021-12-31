@@ -1,15 +1,7 @@
-import {
-  Client,
-  GuildMember,
-  Permissions,
-  User as DiscordUser,
-} from "discord.js";
+import { Client, GuildMember, Permissions, User as DiscordUser } from "discord.js";
 import { Cluster } from "../../entities/Cluster";
 
-export function getUserFromMention(
-  client: Client,
-  arg: string
-): DiscordUser | null {
+export function getUserFromMention(client: Client, arg: string): DiscordUser | null {
   if (!arg) return null;
 
   let mention = arg;

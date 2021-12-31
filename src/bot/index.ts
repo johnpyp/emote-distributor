@@ -17,6 +17,7 @@ export class Bot {
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
         Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
       ],
+      partials: ["MESSAGE"],
     });
     const bot = new Bot(client);
 
@@ -38,13 +39,14 @@ export class Bot {
       logger.info("Client is ready");
     });
 
-    this.client.on("message", async (message) => {
+    this.client.on("messageCreate", async (message) => {
       try {
         await this.commandHandler.handleMessage(message);
       } catch (e) {
         logger.error("Error running command", e);
       }
     });
+
     this.client.login(botToken);
     registerCommands(this.commandHandler);
   }

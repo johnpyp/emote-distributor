@@ -6,7 +6,7 @@ import { Guild } from "./entities/Guild";
 import { User } from "./entities/User";
 
 export async function initializeDatabase(): Promise<Connection> {
-  return createConnection({
+  const connection = await createConnection({
     type: "sqlite",
     database: appConfig.SQLITE_PATH,
     synchronize: true,
@@ -16,4 +16,6 @@ export async function initializeDatabase(): Promise<Connection> {
 
     entities: [Guild, Cluster, User, ClusterUser],
   });
+
+  return connection;
 }

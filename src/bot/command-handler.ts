@@ -45,26 +45,19 @@ export class CommandHandler {
   }
 
   public async handleMessage(message: Message): Promise<void> {
-    const parsed = CommandHandler.parseContent(message, [
-      this.opts.defaultPrefix,
-    ]);
+    const parsed = CommandHandler.parseContent(message, [this.opts.defaultPrefix]);
     if (!parsed) return;
     const command = this.commandStore.aliasFind(parsed.args);
     if (!command) {
-      message.reply(
-        `Invalid command, try using ${this.opts.defaultPrefix}help`
-      );
+      await message.reply(`Invalid command, try using ${this.opts.defaultPrefix}help`);
       return;
     }
-    if (Array.isArray(command))
-      return this.handleOnlySubcommands(command, parsed);
-    return this.handleCommand(command, parsed);
+    if (Array.isArray(command)) return this.handleOnlySubcommands(command, parsed);
+
+    await this.handleCommand(command, parsed);
   }
 
-  private async handleCommand(
-    command: Command,
-    parsed: ParsedMessage
-  ): Promise<void> {
+  private async handleCommand(command: Command, parsed: ParsedMessage): Promise<void> {
     const { message } = parsed;
 
     if (command.guildOnly && message.channel.type === "DM") return;
@@ -75,9 +68,8 @@ export class CommandHandler {
       await command.exec(message, strippedArgs, this.commandUtil);
     } catch (e) {
       const error = e as Error;
-      const { createUserMessage } = e;
-      if (_.isFunction(createUserMessage)) {
-        const userMessage = createUserMessage();
+      if (_.isFunction(e.createUserMessage)) {
+        const userMessage = e.createUserMessage(command);
         await message.reply(userMessage);
         return;
       }
@@ -87,10 +79,7 @@ export class CommandHandler {
     }
   }
 
-  private async handleOnlySubcommands(
-    commands: Command[],
-    parsed: ParsedMessage
-  ): Promise<void> {
+  private async handleOnlySubcommands(commands: Command[], parsed: ParsedMessage): Promise<void> {
     const help = formatSubcommandHelp(commands, parsed.args);
     const chunks = Util.splitMessage(help?.join("\n") ?? "");
     for (const chunk of chunks) {
@@ -100,22 +89,17 @@ export class CommandHandler {
 
   private stripArgs(command: Command, args: string[]): string[] | null {
     const stringArgs = args.join(" ");
-    const foundAlias = command.aliases.find((alias) =>
-      stringArgs.startsWith(alias)
-    );
+    const foundAlias = command.aliases.find((alias) => stringArgs.startsWith(alias));
     if (!foundAlias) return null;
 
     const strippedArgs = stringArgs.slice(foundAlias.length).trim();
     return strippedArgs.split(" ");
   }
 
-  public static parseContent(
-    message: Message,
-    prefixes: string[]
-  ): ParsedMessage | null {
+  public static parseContent(message: Message, prefixes: string[]): ParsedMessage | null {
     const prefix = prefixes.find((p) => message.content.startsWith(p));
     if (!prefix) return null;
-    const allArgs = message.content.slice(prefix.length).trim().split(" ");
+    const allArgs = message.content.slice(prefix.length).trim().split(/\s+/);
 
     logger.verbose(`Parsed args: ${allArgs}`);
     return {

@@ -1,10 +1,12 @@
-import { Message, Util } from "discord.js";
+import { Constants, DiscordAPIError, Message, Util } from "discord.js";
 import _ from "lodash";
 import { Cluster } from "../../../entities/Cluster";
 import { UserError } from "../../../errors";
+import { logger } from "../../../logger";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
 import { canManageEmoji, getEmojiUsage, parseNewEmoteArgs, VALID_EMOTE_REGEX } from "../../util";
+import { optimizeImageUrl } from "../../util/optimize-image";
 
 export class EmoteAdd extends Command {
   constructor() {
@@ -51,12 +53,26 @@ export class EmoteAdd extends Command {
     );
     if (!lowestUsage) throw new UserError("All guilds are full");
 
-    const emoji = await lowestUsage.guild.emojis.create(url, name);
+    const resizedImage = await optimizeImageUrl(url);
 
-    return message.reply(
-      `New emote :${Util.escapeMarkdown(
-        emoji.name ?? ""
-      )}: added to ${cluster.displayString()}: ${emoji}`
-    );
+    try {
+      const emoji = await lowestUsage.guild.emojis.create(resizedImage || url, name);
+
+      return await message.reply(
+        `New emote :${Util.escapeMarkdown(
+          emoji.name ?? ""
+        )}: added to ${cluster.displayString()}: ${emoji}`
+      );
+    } catch (error) {
+      logger.error("Error adding emoji to guild", error);
+      if (error.code === Constants.APIErrors.INVALID_FORM_BODY) {
+        throw new UserError("Emote is too large (max 256kb)");
+      }
+      if (error instanceof DiscordAPIError) {
+        throw new UserError(`Unknown discord error: ${error.message}`);
+      }
+
+      throw new UserError("Unknown error");
+    }
   }
 }
