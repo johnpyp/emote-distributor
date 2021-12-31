@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   server:
     build:
@@ -13,9 +13,4 @@ services:
     init: true
     volumes:
       - ${HOST_DB_PATH:-./data/db}:/workspace/data/db
-    restart: unless-stopped
-  zipkin:
-    image: openzipkin/zipkin
-    ports:
-      - 9411:9411
     restart: unless-stopped
