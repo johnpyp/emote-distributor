@@ -1,4 +1,4 @@
-FROM node:15
+FROM node:16
 
 ARG UID
 ARG GID
@@ -7,7 +7,7 @@ ARG GID
 # RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 RUN curl -L https://github.com/ncopa/su-exec/archive/master.tar.gz | tar xvz && \
-cd su-exec-* && make && mv su-exec /usr/local/bin && cd .. && rm -rf su-exec-*
+  cd su-exec-* && make && mv su-exec /usr/local/bin && cd .. && rm -rf su-exec-*
 
 WORKDIR /workspace/app
 
