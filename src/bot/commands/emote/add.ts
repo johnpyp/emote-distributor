@@ -55,8 +55,12 @@ export class EmoteAdd extends Command {
 
     const resizedImage = await optimizeImageUrl(url);
 
+    if (resizedImage && resizedImage.buf.byteLength > 256_000) {
+      throw new UserError("Emote is too large (max 256kb)");
+    }
+
     try {
-      const emoji = await lowestUsage.guild.emojis.create(resizedImage || url, name);
+      const emoji = await lowestUsage.guild.emojis.create(resizedImage?.buf || url, name);
 
       return await message.reply(
         `New emote :${Util.escapeMarkdown(
@@ -66,10 +70,15 @@ export class EmoteAdd extends Command {
     } catch (error) {
       logger.error("Error adding emoji to guild", error);
       if (error.code === Constants.APIErrors.INVALID_FORM_BODY) {
-        throw new UserError("Emote is too large (max 256kb)");
+        const mimeString = resizedImage?.mime ? ` (${resizedImage.mime})` : "";
+        throw new UserError(`Emote is too large (max 256kb) or wrong file type${mimeString}`);
       }
       if (error instanceof DiscordAPIError) {
         throw new UserError(`Unknown discord error: ${error.message}`);
+      }
+
+      if (error instanceof UserError) {
+        throw error;
       }
 
       throw new UserError("Unknown error");
