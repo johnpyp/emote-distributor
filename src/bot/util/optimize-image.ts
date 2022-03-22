@@ -15,7 +15,7 @@ export const fetchImage = async (url: string): Promise<Buffer> => {
   }
 };
 
-const allowedMimes = ["image/gif", "image/jpeg", "image/jpg", "image/png"];
+const allowedMimes = ["image/gif", "image/jpeg", "image/jpg", "image/png", "image/"];
 const optimizeMimes = ["image/gif", "image/png"];
 
 export interface OptimizedImage {
@@ -23,20 +23,28 @@ export interface OptimizedImage {
   mime: string;
 }
 
-export async function optimizeImageUrl(url: string): Promise<OptimizedImage | undefined> {
+export async function extractImageBuffer(url: string): Promise<OptimizedImage | undefined> {
   const imageBuffer = await fetchImage(url);
   const ft = await fileType.fromBuffer(imageBuffer);
   if (!ft) return;
 
-  console.log(`Mime type: ${ft.mime}`);
+  logger.debug(`Trying emote url with Mime type: ${ft.mime}`);
 
   if (!allowedMimes.includes(ft.mime))
     throw new UserError(`Filetype not supported as an emote (${ft.mime})`);
 
-  if (!optimizeMimes.includes(ft.mime)) return { buf: imageBuffer, mime: ft.mime };
+  if (!optimizeMimes.includes(ft.mime)) {
+    if (imageBuffer.byteLength > 256_000) {
+      throw new UserError(
+        `Emote is too large (over 256kb) and media type doesn't support compression (${ft.mime})`
+      );
+    }
+
+    return { buf: imageBuffer, mime: ft.mime };
+  }
 
   // Only optimize an image if it's greater than 256kb
-  if (imageBuffer.byteLength < 256_000) return;
+  if (imageBuffer.byteLength < 256_000) return { buf: imageBuffer, mime: ft.mime };
 
   logger.debug("Minifying emote image url", { url, mime: ft.mime });
 
@@ -48,6 +56,12 @@ export async function optimizeImageUrl(url: string): Promise<OptimizedImage | un
       imageminGifsicle({ optimizationLevel: 3 }),
     ],
   });
+
+  if (buf.byteLength > 256_000) {
+    throw new UserError(
+      `Emote is too large (over 256kb) even after attempted compression (${ft.mime})`
+    );
+  }
 
   return { buf, mime: ft.mime };
 }

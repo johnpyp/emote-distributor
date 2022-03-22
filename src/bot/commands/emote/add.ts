@@ -6,7 +6,7 @@ import { logger } from "../../../logger";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
 import { canManageEmoji, getEmojiUsage, parseNewEmoteArgs, VALID_EMOTE_REGEX } from "../../util";
-import { optimizeImageUrl } from "../../util/optimize-image";
+import { extractImageBuffer } from "../../util/optimize-image";
 
 export class EmoteAdd extends Command {
   constructor() {
@@ -35,10 +35,15 @@ export class EmoteAdd extends Command {
     const { name, url, animated } = parseNewEmoteArgs(message, args);
 
     const isValidName = VALID_EMOTE_REGEX.test(name);
-    if (!isValidName)
-      return message.reply(
+    if (!isValidName) {
+      throw new UserError(
         "Emote name is formatted incorrectly: only letters, numbers, and underscores are allowed ❌"
       );
+    }
+
+    if (name.length > 32) {
+      throw new UserError("Emote name cannot be longer than 32 characters");
+    }
 
     const guilds = cluster.getDiscordGuilds(this.client);
 
@@ -53,7 +58,7 @@ export class EmoteAdd extends Command {
     );
     if (!lowestUsage) throw new UserError("All guilds are full");
 
-    const resizedImage = await optimizeImageUrl(url);
+    const resizedImage = await extractImageBuffer(url);
 
     if (resizedImage && resizedImage.buf.byteLength > 256_000) {
       throw new UserError("Emote is too large (max 256kb)");
