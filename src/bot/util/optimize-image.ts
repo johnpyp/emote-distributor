@@ -23,8 +23,19 @@ export interface OptimizedImage {
   mime: string;
 }
 
+function humanFileSize(b: number): string {
+  let u = 0;
+  const s = 1024;
+  while (b >= s || -b >= s) {
+    b /= s;
+    u++;
+  }
+  return (u ? b.toFixed(1) + " " : b) + " KMGTPEZY"[u] + "B";
+}
+
 export async function extractImageBuffer(url: string): Promise<OptimizedImage | undefined> {
   const imageBuffer = await fetchImage(url);
+  const humanBeforeSize = humanFileSize(imageBuffer.byteLength);
   const ft = await fileType.fromBuffer(imageBuffer);
   if (!ft) return;
 
@@ -36,7 +47,7 @@ export async function extractImageBuffer(url: string): Promise<OptimizedImage | 
   if (!optimizeMimes.includes(ft.mime)) {
     if (imageBuffer.byteLength > 256_000) {
       throw new UserError(
-        `Emote is too large (over 256kb) and media type doesn't support compression (${ft.mime})`
+        `Emote is too large (over 256kb, ${humanBeforeSize}) and media type doesn't support compression (${ft.mime})`
       );
     }
 
@@ -58,8 +69,9 @@ export async function extractImageBuffer(url: string): Promise<OptimizedImage | 
   });
 
   if (buf.byteLength > 256_000) {
+    const humanAfterSize = humanFileSize(buf.byteLength);
     throw new UserError(
-      `Emote is too large (over 256kb) even after attempted compression (${ft.mime})`
+      `Emote is too large (over 256kb) even after attempted compression (${ft.mime}, ${humanBeforeSize} -> ${humanAfterSize})`
     );
   }
 
