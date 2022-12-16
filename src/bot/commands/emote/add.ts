@@ -60,7 +60,7 @@ export class EmoteAdd extends Command {
 
     const resizedImage = await extractImageBuffer(url);
 
-    if (resizedImage && resizedImage.buf.byteLength > 256_000) {
+    if (resizedImage && resizedImage.buf.byteLength >  262_144 ) {
       throw new UserError("Emote is too large (max 256kb)");
     }
 
