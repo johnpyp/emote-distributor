@@ -15,7 +15,7 @@ export const fetchImage = async (url: string): Promise<Buffer> => {
   }
 };
 
-const allowedMimes = ["image/gif", "image/jpeg", "image/jpg", "image/png", "image/"];
+const allowedMimes = ["image/gif", "image/jpeg", "image/jpg", "image/png", "image/", "image/webp"];
 const optimizeMimes = ["image/gif", "image/png"];
 
 export interface OptimizedImage {
