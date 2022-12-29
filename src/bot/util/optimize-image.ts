@@ -5,6 +5,7 @@ import imageminPngquant from "imagemin-pngquant";
 import imageminGifsicle from "imagemin-gifsicle";
 import { UserError } from "../../errors";
 import { logger } from "../../logger";
+import { MAX_EMOTE_BYTES } from ".";
 
 export const fetchImage = async (url: string): Promise<Buffer> => {
   try {
@@ -45,7 +46,7 @@ export async function extractImageBuffer(url: string): Promise<OptimizedImage | 
     throw new UserError(`Filetype not supported as an emote (${ft.mime})`);
 
   if (!optimizeMimes.includes(ft.mime)) {
-    if (imageBuffer.byteLength > 256_000) {
+    if (imageBuffer.byteLength > MAX_EMOTE_BYTES) {
       throw new UserError(
         `Emote is too large (over 256kb, ${humanBeforeSize}) and media type doesn't support compression (${ft.mime})`
       );
@@ -54,8 +55,8 @@ export async function extractImageBuffer(url: string): Promise<OptimizedImage | 
     return { buf: imageBuffer, mime: ft.mime };
   }
 
-  // Only optimize an image if it's greater than 256kb
-  if (imageBuffer.byteLength < 256_000) return { buf: imageBuffer, mime: ft.mime };
+  // Don't optimize an image if it's less than 256kb
+  if (imageBuffer.byteLength < MAX_EMOTE_BYTES) return { buf: imageBuffer, mime: ft.mime };
 
   logger.debug("Minifying emote image url", { url, mime: ft.mime });
 

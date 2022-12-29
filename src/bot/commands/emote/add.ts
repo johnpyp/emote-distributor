@@ -5,7 +5,13 @@ import { UserError } from "../../../errors";
 import { logger } from "../../../logger";
 import { Command } from "../../command";
 import { checkPermissions, Permission } from "../../permissions";
-import { canManageEmoji, getEmojiUsage, parseNewEmoteArgs, VALID_EMOTE_REGEX } from "../../util";
+import {
+  canManageEmoji,
+  getEmojiUsage,
+  MAX_EMOTE_BYTES,
+  parseNewEmoteArgs,
+  VALID_EMOTE_REGEX,
+} from "../../util";
 import { extractImageBuffer } from "../../util/optimize-image";
 
 export class EmoteAdd extends Command {
@@ -60,7 +66,7 @@ export class EmoteAdd extends Command {
 
     const resizedImage = await extractImageBuffer(url);
 
-    if (resizedImage && resizedImage.buf.byteLength >  262_144 ) {
+    if (resizedImage && resizedImage.buf.byteLength > MAX_EMOTE_BYTES) {
       throw new UserError("Emote is too large (max 256kb)");
     }
 

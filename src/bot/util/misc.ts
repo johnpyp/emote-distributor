@@ -56,3 +56,6 @@ export function formatSubcommandHelp(commands: Command[], args?: string[]): stri
   const helps = formatManyHelp(commands, args);
   return [`Use one of the subcommands:`, ``, ...helps];
 }
+
+// 256kb
+export const MAX_EMOTE_BYTES = 262_144;
