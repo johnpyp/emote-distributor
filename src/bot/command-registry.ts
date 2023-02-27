@@ -13,6 +13,7 @@ import { EmoteRename } from "./commands/emote/rename";
 import { Help } from "./commands/help";
 import { Ping } from "./commands/ping";
 import { ClusterStaff } from "./commands/cluster/staff";
+import { EmoteForceFix } from "./commands/emote/force-fix";
 
 export function registerCommands(handler: CommandHandler): void {
   handler.register(new Ping());
@@ -30,4 +31,5 @@ export function registerCommands(handler: CommandHandler): void {
   handler.register(new EmoteRemove());
   handler.register(new EmoteList());
   handler.register(new EmoteRename());
+  handler.register(new EmoteForceFix());
 }

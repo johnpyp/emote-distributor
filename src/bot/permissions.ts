@@ -19,6 +19,7 @@ export enum Permission {
   RemoveEmote,
   RenameEmote,
   ListEmotes,
+  ForceFixEmote,
 }
 
 export enum Roles {
