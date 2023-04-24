@@ -3,7 +3,10 @@ import _ from "lodash";
 import path from "path";
 import invariant from "tiny-invariant";
 import { ArgsError, UserError } from "../../errors";
+import { logger } from "../../logger";
+import { SevenTVApi, SevenTVEmote } from "./7tv-api";
 
+const ALPHA1_REGEX = /^[a-zA-Z0-9]+$/;
 export const VALID_EMOTE_REGEX = /^[a-zA-Z0-9_]{2,}$/;
 export const EMOTE_REGEX = /(:|;)(?<name>\w{2,32})\1|(?<newline>\n)/g;
 
@@ -46,7 +49,7 @@ export interface EmoteData {
   url: string;
   animated: boolean;
 }
-export function parseNewEmoteArgs(message: Message, args: string[]): EmoteData {
+export async function parseNewEmoteArgs(message: Message, args: string[]): Promise<EmoteData> {
   if (message.attachments.size > 0) {
     const attachment = message.attachments.first();
     invariant(attachment, "First attachment doesn't exist");
@@ -70,12 +73,7 @@ export function parseNewEmoteArgs(message: Message, args: string[]): EmoteData {
     const parsed = parseCustomEmoji(args[1]);
 
     if (!parsed) {
-      const url = stripAngleBrackets(args[1]);
-      return {
-        name,
-        animated: url.endsWith("gif"),
-        url,
-      };
+      return handleParseInputUrl(name, args[1]);
     }
     const url = getEmoteUrl(parsed.id, parsed.animated);
 
@@ -83,6 +81,74 @@ export function parseNewEmoteArgs(message: Message, args: string[]): EmoteData {
   }
 
   throw new ArgsError("No emote or name provided ❌");
+}
+
+async function handleParseInputUrl(name: string, rawUrl: string): Promise<EmoteData> {
+  const unsanitizedUrl = stripAngleBrackets(rawUrl);
+
+  invariant(unsanitizedUrl.length < 1000, "1000-length urls are unreasonable");
+
+  const parsedUrl = new URL(unsanitizedUrl);
+  const url = parsedUrl.toString();
+
+  // Handle 7tv case
+  if (url.includes("https://7tv.app/emotes/")) {
+    const [_none, prefix, emoteId] = parsedUrl.pathname.split("/").map((x) => x.trim());
+    console.log({ parsedUrl, pathname: parsedUrl.pathname, prefix, emoteId });
+    invariant(prefix === "emotes", "The prefix should always be /emotes/");
+    if (!emoteId) throw new UserError("No emote id in given url");
+    const isValidEmoteId = ALPHA1_REGEX.test(emoteId);
+    if (!isValidEmoteId) throw new UserError("Invalid emote id");
+
+    let fetchedEmote: SevenTVEmote | null;
+    try {
+      fetchedEmote = await SevenTVApi.getEmote(emoteId);
+    } catch (e) {
+      logger.error("Error fetching 7tv emote", e);
+      throw new UserError("Something went wrong retrieving the 7tv emote");
+    }
+
+    if (!fetchedEmote) throw new UserError("Couldn't find given 7tv emote");
+
+    const webpFiles = fetchedEmote.host.files.filter((file) => file.format === "WEBP");
+
+    // Prefer the largest webp image under threshold
+    let okSizeEmoteFile = _.maxBy(
+      webpFiles.filter((file) => file.size <= 256 * 1024),
+      "size"
+    );
+    if (!okSizeEmoteFile) {
+      // If we can't find a suitable emote file to use, get the smallest webp, otherwise get the first one
+      okSizeEmoteFile = _.minBy(webpFiles, "size") ?? webpFiles[0];
+    }
+
+    invariant(okSizeEmoteFile, "There should be at least one webp emote file available");
+
+    const emoteSizeName = okSizeEmoteFile.name.split(".")[0];
+    invariant(emoteSizeName, "Emote size (e.g 4x) should be available once splitting on extension");
+
+    const extensionToUse = fetchedEmote.animated ? ".gif" : ".webp";
+
+    // Example
+    // https: + //cdn.7tv.app/emote/612398bac50a1832d0ab846b + / + 4x + (.gif | .webp)
+    const imageUrl = new URL(
+      "https:" + fetchedEmote.host.url + "/" + emoteSizeName + extensionToUse
+    );
+
+    logger.info("Using 7tv image url", { imageUrl: imageUrl.toString() });
+
+    return {
+      name,
+      url: imageUrl.toString(),
+      animated: fetchedEmote.animated,
+    };
+  }
+
+  return {
+    name,
+    animated: url.endsWith("gif"),
+    url,
+  };
 }
 
 export interface ParsedCustomEmoji {

@@ -20,6 +20,7 @@ module.exports = {
 		"consistent-return": ["off"],
 		"class-methods-use-this": ["off"],
 
+		"@typescript-eslint/no-use-before-define": ["error", "nofunc"],
 		"@typescript-eslint/naming-convention": [
 			"error",
 			{

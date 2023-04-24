@@ -38,7 +38,7 @@ export class EmoteAdd extends Command {
       return message.reply(`Insufficient permissions`);
     }
 
-    const { name, url, animated } = parseNewEmoteArgs(message, args);
+    const { name, url, animated } = await parseNewEmoteArgs(message, args);
 
     const isValidName = VALID_EMOTE_REGEX.test(name);
     if (!isValidName) {
