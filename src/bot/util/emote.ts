@@ -49,6 +49,7 @@ export interface EmoteData {
   url: string;
   animated: boolean;
 }
+
 export async function parseNewEmoteArgs(message: Message, args: string[]): Promise<EmoteData> {
   if (message.attachments.size > 0) {
     const attachment = message.attachments.first();
@@ -131,9 +132,7 @@ async function handleParseInputUrl(name: string, rawUrl: string): Promise<EmoteD
 
     // Example
     // https: + //cdn.7tv.app/emote/612398bac50a1832d0ab846b + / + 4x + (.gif | .webp)
-    const imageUrl = new URL(
-      "https:" + fetchedEmote.host.url + "/" + emoteSizeName + extensionToUse
-    );
+    const imageUrl = new URL(`https:${fetchedEmote.host.url}/${emoteSizeName}${extensionToUse}`);
 
     logger.info("Using 7tv image url", { imageUrl: imageUrl.toString() });
 
